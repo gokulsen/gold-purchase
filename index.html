@@ -50,18 +50,18 @@
 <button id="logout" class="btn-primary">Logout</button>
 
 <div class="summary">
-    <div class="card">Total Gold: <span id="totalGold">0</span> g</div>
-    <div class="card">Total Cost: ₹<span id="totalCost">0</span></div>
     <div class="card">Today's Gold Price: ₹<input type="number" id="todayPrice" step="0.01" value="12720"></div>
-    <div class="card">Profit/Loss: ₹<span id="profitLoss">0</span></div>
-    <div class="card">Profit/Loss %: <span id="profitLossPercent">0</span>%</div>
+	<div class="card">Total Gold: <span id="totalGold">0</span> g</div>
+    <div class="card">Total Cost: ₹<span id="totalCost">0</span></div>
     <div class="card">Current Value: ₹<span id="currentValue">0</span></div>
+	<div class="card">Profit/Loss: ₹<span id="profitLoss">0</span></div>
+    <div class="card">Profit/Loss %: <span id="profitLossPercent">0</span>%</div>
 </div>
 
 <form id="addForm">
     <input type="date" id="purchaseDate" required>
     <input type="number" step="0.01" id="amount" placeholder="Amount ₹" required>
-    <input type="number" step="0.001" id="gold" placeholder="Gold g" required>
+    <input type="number" step="0.001" id="gold" placeholder="Gold weight in gram" required>
     <button type="submit" class="btn-primary">Add Purchase</button>
 </form>
 
@@ -70,7 +70,7 @@
 <tr>
     <th>Purchase Date</th>
     <th>Amount (₹)</th>
-    <th>Gold (g)</th>
+    <th>Gold Weight (g)</th>
     <th>Actions</th>
 </tr>
 </thead>
