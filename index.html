@@ -5,32 +5,141 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gold Purchase Tracker</title>
 <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
-    h1 { text-align: center; }
-    .summary { margin-bottom: 20px; padding: 10px; background: #fff; border-radius: 8px; box-shadow: 0 0 5px #ccc; display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; }
-    .summary div { display: flex; align-items: center; gap: 5px; }
-    .summary input { width: 100px; padding: 4px; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 5px #ccc; }
-    th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
-    th { background: #f0c040; color: #000; }
-    tr:last-child td { border-bottom: none; }
-    #addForm { margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap; }
-    #addForm input, #addForm button { padding: 8px; font-size: 14px; }
-    button { cursor: pointer; background: #f0c040; border: none; border-radius: 5px; padding: 5px 10px; }
-    button:hover { background: #e6b800; }
+    /* General Styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+        margin: 0;
+        padding: 20px;
+        color: #333;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #d4af37; /* Gold color */
+        text-shadow: 1px 1px 2px #999;
+    }
+
+    /* Summary Card */
+    .summary {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        padding: 15px 20px;
+        flex: 1 1 180px;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    .card span {
+        font-weight: bold;
+        font-size: 1.3em;
+        color: #d4af37;
+    }
+    .card input {
+        width: 90px;
+        padding: 5px 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+
+    /* Form */
+    #addForm {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
+    #addForm input, #addForm button {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+    #addForm button {
+        background: #d4af37;
+        color: #fff;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    #addForm button:hover {
+        background: #bfa034;
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        background: #fff;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: center;
+    }
+    th {
+        background: #d4af37;
+        color: #fff;
+    }
+    tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+    tr:hover {
+        background: #fff3cd;
+    }
+
+    /* Action buttons */
+    .action-btn {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        margin: 0 2px;
+        transition: 0.2s;
+    }
+    .edit-btn {
+        background: #17a2b8;
+        color: #fff;
+    }
+    .edit-btn:hover {
+        background: #138496;
+    }
+    .delete-btn {
+        background: #dc3545;
+        color: #fff;
+    }
+    .delete-btn:hover {
+        background: #c82333;
+    }
 </style>
 </head>
 <body>
+
 <h1>Gold Purchase Tracker</h1>
 
 <div class="summary">
-    <div>Total Gold: <span id="totalGold">0</span> g</div>
-    <div>Total Cost: ₹<span id="totalCost">0</span></div>
-    <div>
-        Today's Gold Price: ₹<input type="number" id="todayPrice" step="0.01" value="6200">
-    </div>
-    <div>Profit/Loss: ₹<span id="profitLoss">0</span></div>
-    <div>Profit/Loss %: <span id="profitLossPercent">0</span>%</div>
+    <div class="card">Total Gold: <span id="totalGold">0</span> g</div>
+    <div class="card">Total Cost: ₹<span id="totalCost">0</span></div>
+    <div class="card">Today's Gold Price: ₹<input type="number" id="todayPrice" step="0.01" value="6200"></div>
+    <div class="card">Profit/Loss: ₹<span id="profitLoss">0</span></div>
+    <div class="card">Profit/Loss %: <span id="profitLossPercent">0</span>%</div>
 </div>
 
 <form id="addForm">
@@ -67,9 +176,9 @@ const todayPriceInput = document.getElementById('todayPrice')
 const profitLossEl = document.getElementById('profitLoss')
 const profitLossPercentEl = document.getElementById('profitLossPercent')
 
-let editingId = null // Track if we are editing a row
+let editingId = null
 
-// Load purchases from Supabase
+// Load purchases
 async function loadPurchases() {
     const { data, error } = await supabase
         .from('gold_purchases')
@@ -83,7 +192,7 @@ async function loadPurchases() {
     calculateSummary()
 }
 
-// Add a row to the table with edit/delete buttons
+// Add row with Edit/Delete buttons
 function addRowToTable(purchase) {
     const row = document.createElement('tr')
     row.dataset.id = purchase.id
@@ -92,14 +201,14 @@ function addRowToTable(purchase) {
         <td>₹${parseFloat(purchase.amount).toFixed(2)}</td>
         <td>${parseFloat(purchase.gold).toFixed(3)} g</td>
         <td>
-            <button onclick="editRow(${purchase.id})">Edit</button>
-            <button onclick="deleteRow(${purchase.id})">Delete</button>
+            <button class="action-btn edit-btn" onclick="editRow(${purchase.id})">Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteRow(${purchase.id})">Delete</button>
         </td>
     `
     purchaseTable.appendChild(row)
 }
 
-// Calculate totals and profit/loss
+// Calculate summary
 function calculateSummary() {
     let totalGold = 0
     let totalCost = 0
@@ -119,29 +228,26 @@ function calculateSummary() {
         profitLossEl.innerText = profitLoss.toFixed(2)
         const profitPercent = totalCost > 0 ? (profitLoss / totalCost) * 100 : 0
         profitLossPercentEl.innerText = profitPercent.toFixed(2)
+        profitLossEl.style.color = profitLoss >= 0 ? 'green' : 'red'
+        profitLossPercentEl.style.color = profitLoss >= 0 ? 'green' : 'red'
     } else {
         profitLossEl.innerText = '0'
         profitLossPercentEl.innerText = '0'
     }
 }
 
-// Delete a row from Supabase and table
+// Delete row
 window.deleteRow = async (id) => {
     if (!confirm('Are you sure you want to delete this purchase?')) return
-    const { error } = await supabase
-        .from('gold_purchases')
-        .delete()
-        .eq('id', id)
+    const { error } = await supabase.from('gold_purchases').delete().eq('id', id)
     if (error) { alert('Error deleting row'); console.error(error); return }
     loadPurchases()
 }
 
-// Edit a row
+// Edit row
 window.editRow = (id) => {
     const row = purchaseTable.querySelector(`tr[data-id='${id}']`)
     if (!row) return
-
-    // Pre-fill form with row data
     document.getElementById('purchaseDate').value = row.cells[0].innerText
     document.getElementById('amount').value = parseFloat(row.cells[1].innerText.replace('₹',''))
     document.getElementById('gold').value = parseFloat(row.cells[2].innerText.replace(' g',''))
@@ -149,7 +255,7 @@ window.editRow = (id) => {
     addForm.querySelector('button').innerText = 'Update Purchase'
 }
 
-// Handle form submit (Add or Update)
+// Add/Update purchase
 addForm.addEventListener('submit', async (e) => {
     e.preventDefault()
     const purchaseDate = document.getElementById('purchaseDate').value
@@ -157,20 +263,13 @@ addForm.addEventListener('submit', async (e) => {
     const gold = parseFloat(document.getElementById('gold').value)
 
     if (editingId) {
-        // Update existing row
-        const { error } = await supabase
-            .from('gold_purchases')
-            .update({ purchase_date: purchaseDate, amount, gold })
-            .eq('id', editingId)
-        if (error) { alert('Error updating row'); console.error(error); return }
+        const { error } = await supabase.from('gold_purchases').update({ purchase_date: purchaseDate, amount, gold }).eq('id', editingId)
+        if (error) { alert('Error updating'); console.error(error); return }
         editingId = null
         addForm.querySelector('button').innerText = 'Add Purchase'
     } else {
-        // Insert new row
-        const { data, error } = await supabase
-            .from('gold_purchases')
-            .insert([{ purchase_date: purchaseDate, amount, gold }])
-        if (error) { alert('Error adding purchase'); console.error(error); return }
+        const { data, error } = await supabase.from('gold_purchases').insert([{ purchase_date: purchaseDate, amount, gold }])
+        if (error) { alert('Error adding'); console.error(error); return }
     }
 
     addForm.reset()
