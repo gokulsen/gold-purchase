@@ -138,6 +138,7 @@
     <div class="card">Total Gold: <span id="totalGold">0</span> g</div>
     <div class="card">Total Cost: ₹<span id="totalCost">0</span></div>
     <div class="card">Today's Gold Price: ₹<input type="number" id="todayPrice" step="0.01" value="12720"></div>
+    <div class="card">Current Value: ₹<span id="currentValue">0</span></div>
     <div class="card">Profit/Loss: ₹<span id="profitLoss">0</span></div>
     <div class="card">Profit/Loss %: <span id="profitLossPercent">0</span>%</div>
 </div>
@@ -223,17 +224,24 @@ function calculateSummary() {
     totalCostEl.innerText = totalCost.toFixed(2)
 
     const todayPrice = parseFloat(todayPriceInput.value)
+    let profitLoss = 0
     if (!isNaN(todayPrice)) {
-        const profitLoss = (totalGold * todayPrice) - totalCost
+        profitLoss = (totalGold * todayPrice) - totalCost
         profitLossEl.innerText = profitLoss.toFixed(2)
         const profitPercent = totalCost > 0 ? (profitLoss / totalCost) * 100 : 0
         profitLossPercentEl.innerText = profitPercent.toFixed(2)
+
+        // Color for profit/loss
         profitLossEl.style.color = profitLoss >= 0 ? 'green' : 'red'
         profitLossPercentEl.style.color = profitLoss >= 0 ? 'green' : 'red'
     } else {
         profitLossEl.innerText = '0'
         profitLossPercentEl.innerText = '0'
     }
+
+    // Calculate current value
+    const currentValue = totalCost + profitLoss
+    document.getElementById('currentValue').innerText = currentValue.toFixed(2)
 }
 
 // Delete row
