@@ -5,64 +5,192 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gold Purchase Tracker</title>
 <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(to right, #f5f7fa, #c3cfe2); margin:0; padding:0;}
-    h1 { text-align: center; color: #d4af37; text-shadow:1px 1px 2px #999; margin:20px 0;}
-    .container { max-width: 1000px; margin: auto; padding: 20px;}
-    .summary { display:flex; flex-wrap:wrap; gap:15px; justify-content: space-around; margin-bottom:20px;}
-    .card { background:#fff; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.1); padding:15px 20px; flex:1 1 180px; text-align:center; transition:transform 0.2s;}
-    .card:hover { transform: translateY(-5px); box-shadow:0 10px 20px rgba(0,0,0,0.15);}
-    .card span { font-weight:bold; font-size:1.3em; color:#d4af37;}
-    .card input { width:90px; padding:5px 8px; border-radius:5px; border:1px solid #ccc; text-align:center;}
-    #addForm, #loginForm { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:25px;}
-    input, button { padding:10px 12px; font-size:14px; border-radius:8px; border:1px solid #ccc;}
-    button { cursor:pointer; font-weight:bold; transition:0.2s;}
-    .btn-primary { background:#d4af37; color:#fff; border:none;}
-    .btn-primary:hover { background:#bfa034;}
-    table { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; box-shadow:0 6px 15px rgba(0,0,0,0.1); background:#fff;}
-    th, td { padding:12px 15px; text-align:center;}
-    th { background:#d4af37; color:#fff;}
-    tr:nth-child(even){ background:#f9f9f9;}
-    tr:hover{ background:#fff3cd;}
-    .action-btn { padding:5px 10px; border-radius:5px; border:none; cursor:pointer; font-weight:bold; margin:0 2px; transition:0.2s;}
-    .edit-btn { background:#17a2b8; color:#fff;}
-    .edit-btn:hover { background:#138496;}
-    .delete-btn { background:#dc3545; color:#fff;}
-    .delete-btn:hover { background:#c82333;}
-    #logout { float:right; margin-bottom:15px; background:#dc3545; color:#fff; }
+    :root {
+        --gold: #d4af37;
+        --dark-gold: #b08d2a;
+        --light-gold: #f1d36c;
+        --black-bg: #121212;
+        --gray: #cfcfcf;
+        --white: #fff;
+    }
+    body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #1c1c1c, #000000);
+        margin: 0;
+        color: var(--gray);
+        min-height: 100vh;
+    }
+    h1 {
+        text-align: center;
+        color: var(--gold);
+        text-shadow: 0 0 10px var(--dark-gold);
+        margin: 30px 0;
+        letter-spacing: 1px;
+    }
+    .container {
+        max-width: 1100px;
+        margin: auto;
+        padding: 20px;
+    }
+    .summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: space-around;
+        margin-bottom: 30px;
+    }
+    .card {
+        background: linear-gradient(145deg, #1a1a1a, #262626);
+        border: 1px solid var(--dark-gold);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        padding: 18px 25px;
+        flex: 1 1 200px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    }
+    .card span {
+        font-size: 1.4em;
+        color: var(--light-gold);
+        font-weight: bold;
+    }
+    .card input {
+        background: transparent;
+        border: 1px solid var(--gold);
+        border-radius: 6px;
+        color: var(--white);
+        text-align: center;
+        padding: 6px;
+        width: 100px;
+    }
+    .card button {
+        margin-left: 8px;
+        background: linear-gradient(90deg, var(--gold), var(--light-gold));
+        border: none;
+        border-radius: 5px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    .card button:hover {
+        background: linear-gradient(90deg, var(--light-gold), var(--gold));
+        transform: scale(1.05);
+    }
+    #addForm, #loginForm {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
+    input, button {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid var(--dark-gold);
+        background: #1e1e1e;
+        color: var(--white);
+        outline: none;
+    }
+    input:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 5px var(--gold);
+    }
+    button {
+        background: linear-gradient(90deg, var(--gold), var(--light-gold));
+        color: #000;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    #logout {
+        float: right;
+        margin-bottom: 15px;
+        background: linear-gradient(90deg, #ff6b6b, #d32f2f);
+        color: #fff;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1e1e1e;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: center;
+    }
+    th {
+        background: linear-gradient(90deg, var(--gold), var(--dark-gold));
+        color: #000;
+    }
+    tr:hover { background: rgba(212,175,55,0.1); }
+    .action-btn {
+        padding: 6px 12px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        margin: 0 2px;
+        transition: 0.2s;
+    }
+    .edit-btn { background: linear-gradient(90deg, #17a2b8, #138496); color: #fff; }
+    .delete-btn { background: linear-gradient(90deg, #dc3545, #c82333); color: #fff; }
+    a { color: var(--light-gold); }
+    #loginDiv {
+        background: #1b1b1b;
+        border: 1px solid var(--dark-gold);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(212,175,55,0.2);
+        max-width: 400px;
+        margin: 50px auto;
+        text-align: center;
+    }
 </style>
 </head>
 <body>
 <div class="container">
-<h1>Gold Purchase Tracker</h1>
+<h1>🏆 Gold Purchase Tracker 🏆</h1>
 
-<!-- Login Form -->
+<!-- LOGIN FORM -->
 <div id="loginDiv">
 <form id="loginForm">
     <input type="email" id="loginEmail" placeholder="Email" required>
     <input type="password" id="loginPassword" placeholder="Password" required>
-    <button type="submit" class="btn-primary">Login</button>
+    <button type="submit">Login</button>
 </form>
-<p style="text-align:center;">Don't have an account? <a href="#" id="signupLink">Sign up</a></p>
+<p>Don’t have an account? <a href="#" id="signupLink">Sign up</a></p>
 </div>
 
-<!-- Main App -->
+<!-- MAIN APP -->
 <div id="appDiv" style="display:none;">
-<button id="logout" class="btn-primary">Logout</button>
+<button id="logout">Logout</button>
 
 <div class="summary">
-    <div class="card">Today's Gold Price: ₹<input type="number" id="todayPrice" step="0.01" value="12720"></div>
-	<div class="card">Total Gold: <span id="totalGold">0</span> g</div>
+    <div class="card">Total Gold: <span id="totalGold">0</span> g</div>
     <div class="card">Total Cost: ₹<span id="totalCost">0</span></div>
-    <div class="card">Current Value: ₹<span id="currentValue">0</span></div>
-	<div class="card">Profit/Loss: ₹<span id="profitLoss">0</span></div>
+    <div class="card">
+        Today's Gold Price: ₹<input type="number" id="todayPrice" step="0.01" value="0">
+        <button id="savePrice">Save</button>
+    </div>
+    <div class="card">Profit/Loss: ₹<span id="profitLoss">0</span></div>
     <div class="card">Profit/Loss %: <span id="profitLossPercent">0</span>%</div>
+    <div class="card">Current Value: ₹<span id="currentValue">0</span></div>
 </div>
 
 <form id="addForm">
     <input type="date" id="purchaseDate" required>
     <input type="number" step="0.01" id="amount" placeholder="Amount ₹" required>
-    <input type="number" step="0.001" id="gold" placeholder="Gold weight in gram" required>
-    <button type="submit" class="btn-primary">Add Purchase</button>
+    <input type="number" step="0.001" id="gold" placeholder="Gold g" required>
+    <button type="submit">Add Purchase</button>
 </form>
 
 <table>
@@ -70,7 +198,7 @@
 <tr>
     <th>Purchase Date</th>
     <th>Amount (₹)</th>
-    <th>Gold Weight (g)</th>
+    <th>Gold (g)</th>
     <th>Actions</th>
 </tr>
 </thead>
@@ -83,161 +211,133 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const SUPABASE_URL = 'https://febpaanqrqgrnbyrvfxx.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYnBhYW5xcnFncm5ieXJ2Znh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDUzNzMsImV4cCI6MjA3NjUyMTM3M30.dFyrWiNKqGCVDGLN9HU2IyRuI6rqAJaZGwRQjXri3mQ'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYnBhYW5xcnFncm5ieXJ2Znh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDUzNzMsImV4cCI6MjA3NjUyMTM3M30.dFyrWiNKqGCVDGLN9HU2IyRuI6rqAJaZGwRQjXri3mQ'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const loginDiv=document.getElementById('loginDiv'), appDiv=document.getElementById('appDiv'), loginForm=document.getElementById('loginForm')
+const signupLink=document.getElementById('signupLink'), logoutBtn=document.getElementById('logout')
+const addForm=document.getElementById('addForm'), purchaseTable=document.getElementById('purchaseTable')
+const totalGoldEl=document.getElementById('totalGold'), totalCostEl=document.getElementById('totalCost')
+const todayPriceInput=document.getElementById('todayPrice'), profitLossEl=document.getElementById('profitLoss')
+const profitLossPercentEl=document.getElementById('profitLossPercent'), currentValueEl=document.getElementById('currentValue')
+const savePriceBtn=document.getElementById('savePrice')
+let editingId=null
 
-const loginDiv = document.getElementById('loginDiv')
-const loginForm = document.getElementById('loginForm')
-const signupLink = document.getElementById('signupLink')
-const appDiv = document.getElementById('appDiv')
-const logoutBtn = document.getElementById('logout')
-
-const addForm = document.getElementById('addForm')
-const purchaseTable = document.getElementById('purchaseTable')
-const totalGoldEl = document.getElementById('totalGold')
-const totalCostEl = document.getElementById('totalCost')
-const todayPriceInput = document.getElementById('todayPrice')
-const profitLossEl = document.getElementById('profitLoss')
-const profitLossPercentEl = document.getElementById('profitLossPercent')
-const currentValueEl = document.getElementById('currentValue')
-
-let editingId = null
-
-// Check user session
-async function checkUser() {
-    const { data } = await supabase.auth.getSession()
-    if (data.session) showApp(data.session.user)
-}
+// AUTH
+async function checkUser(){ const {data}=await supabase.auth.getSession(); if(data.session) showApp() }
 checkUser()
+loginForm.addEventListener('submit',async e=>{
+    e.preventDefault()
+    const email=document.getElementById('loginEmail').value
+    const password=document.getElementById('loginPassword').value
+    const {error}=await supabase.auth.signInWithPassword({email,password})
+    if(error) return alert(error.message)
+    showApp()
+})
+signupLink.addEventListener('click',async()=>{
+    const email=prompt('Enter email:')
+    const password=prompt('Enter password:')
+    if(!email||!password)return
+    const {error}=await supabase.auth.signUp({email,password})
+    if(error) alert(error.message); else alert('Signup successful! Please log in.')
+})
+logoutBtn.addEventListener('click',async()=>{ await supabase.auth.signOut(); location.reload(); })
 
-// Show main app
-function showApp(user) {
-    loginDiv.style.display = 'none'
-    appDiv.style.display = 'block'
-    loadPurchases()
+// APP VIEW
+function showApp(){ loginDiv.style.display='none'; appDiv.style.display='block'; loadPurchases(); loadGoldPrice(); }
+
+// Load latest gold price
+async function loadGoldPrice(){
+    const {data,error}=await supabase.from('gold_price').select('*').order('id',{ascending:false}).limit(1)
+    if(!error && data.length>0){ todayPriceInput.value=data[0].price }
 }
 
-// Logout
-logoutBtn.addEventListener('click', async () => {
-    await supabase.auth.signOut()
-    location.reload()
+// Save gold price to DB
+savePriceBtn.addEventListener('click', async ()=>{
+    const price=parseFloat(todayPriceInput.value)
+    if(isNaN(price)||price<=0){ alert('Enter a valid gold price'); return }
+    const {error}=await supabase.from('gold_price').insert([{price}])
+    if(error){ alert('Error saving price'); console.error(error); return }
+    alert('Gold price saved successfully!')
+    calculateSummary()
 })
 
-// Login
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const email = document.getElementById('loginEmail').value
-    const password = document.getElementById('loginPassword').value
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) { alert(error.message); return }
-    showApp(data.user)
-})
-
-// Signup link
-signupLink.addEventListener('click', async () => {
-    const email = prompt('Enter email:')
-    const password = prompt('Enter password:')
-    if (!email || !password) return
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    if (error) { alert(error.message); return }
-    alert('Signup successful! Please log in.')
-})
-
-// Load purchases for current user
-async function loadPurchases() {
-    const { data, error } = await supabase
-        .from('gold_purchases')
-        .select('*')
-        .order('purchase_date', { ascending:true })
-    if (error) { console.error(error); return }
-    purchaseTable.innerHTML = ''
-    data.forEach(p => addRowToTable(p))
+// Load purchases
+async function loadPurchases(){
+    const {data,error}=await supabase.from('gold_purchases').select('*').order('purchase_date',{ascending:true})
+    if(error){console.error(error);return}
+    purchaseTable.innerHTML=''
+    data.forEach(p=>addRow(p))
     calculateSummary()
 }
 
-// Add row
-function addRowToTable(p) {
-    const row = document.createElement('tr')
-    row.dataset.id = p.id
-    row.innerHTML = `
+function addRow(p){
+    const row=document.createElement('tr')
+    row.dataset.id=p.id
+    row.innerHTML=`
         <td>${p.purchase_date}</td>
         <td>₹${parseFloat(p.amount).toFixed(2)}</td>
         <td>${parseFloat(p.gold).toFixed(3)} g</td>
         <td>
             <button class="action-btn edit-btn" onclick="editRow(${p.id})">Edit</button>
             <button class="action-btn delete-btn" onclick="deleteRow(${p.id})">Delete</button>
-        </td>
-    `
+        </td>`
     purchaseTable.appendChild(row)
 }
 
-// Calculate summary
-function calculateSummary() {
-    let totalGold=0, totalCost=0
-    purchaseTable.querySelectorAll('tr').forEach(row=>{
-        const amount=parseFloat(row.cells[1].innerText.replace('₹',''))
-        const gold=parseFloat(row.cells[2].innerText.replace(' g',''))
-        totalGold+=gold
-        totalCost+=amount
+function calculateSummary(){
+    let gold=0,cost=0
+    purchaseTable.querySelectorAll('tr').forEach(r=>{
+        cost+=parseFloat(r.cells[1].innerText.replace('₹',''))
+        gold+=parseFloat(r.cells[2].innerText.replace(' g',''))
     })
-    totalGoldEl.innerText = totalGold.toFixed(3)
-    totalCostEl.innerText = totalCost.toFixed(2)
-    const todayPrice = parseFloat(todayPriceInput.value)
-    let profitLoss = 0
-    if (!isNaN(todayPrice)) {
-        profitLoss = (totalGold*todayPrice) - totalCost
-        profitLossEl.innerText = profitLoss.toFixed(2)
-        profitLossPercentEl.innerText = (totalCost>0 ? (profitLoss/totalCost)*100 : 0).toFixed(2)
-        profitLossEl.style.color = profitLoss>=0?'green':'red'
-        profitLossPercentEl.style.color = profitLoss>=0?'green':'red'
-    } else { profitLossEl.innerText='0'; profitLossPercentEl.innerText='0' }
-    currentValueEl.innerText = (totalCost + profitLoss).toFixed(2)
+    totalGoldEl.innerText=gold.toFixed(3)
+    totalCostEl.innerText=cost.toFixed(2)
+    const price=parseFloat(todayPriceInput.value)
+    const profit=(gold*price)-cost
+    profitLossEl.innerText=profit.toFixed(2)
+    profitLossPercentEl.innerText=(cost>0?(profit/cost)*100:0).toFixed(2)
+    profitLossEl.style.color=profit>=0?'#00ff7f':'#ff4d4d'
+    profitLossPercentEl.style.color=profit>=0?'#00ff7f':'#ff4d4d'
+    currentValueEl.innerText=(cost+profit).toFixed(2)
 }
+todayPriceInput.addEventListener('input',calculateSummary)
 
-// Add / Update purchase
-addForm.addEventListener('submit', async (e)=>{
+addForm.addEventListener('submit',async e=>{
     e.preventDefault()
-    const purchaseDate = document.getElementById('purchaseDate').value
-    const amount = parseFloat(document.getElementById('amount').value)
-    const gold = parseFloat(document.getElementById('gold').value)
-    const { data: userData } = await supabase.auth.getUser()
-    const user_id = userData.user.id
-
+    const d=document.getElementById('purchaseDate').value
+    const a=parseFloat(document.getElementById('amount').value)
+    const g=parseFloat(document.getElementById('gold').value)
+    const {data:user}=await supabase.auth.getUser()
+    const uid=user.user.id
     if(editingId){
-        const { error } = await supabase.from('gold_purchases').update({ purchase_date, amount, gold }).eq('id', editingId)
-        if(error){ alert('Error updating'); console.error(error); return }
+        const {error}=await supabase.from('gold_purchases').update({purchase_date:d,amount:a,gold:g}).eq('id',editingId)
+        if(error)return alert('Error updating')
         editingId=null
         addForm.querySelector('button').innerText='Add Purchase'
     } else {
-        const { error } = await supabase.from('gold_purchases').insert([{ purchase_date, amount, gold, user_id }])
-        if(error){ alert('Error adding'); console.error(error); return }
+        const {error}=await supabase.from('gold_purchases').insert([{purchase_date:d,amount:a,gold:g,user_id:uid}])
+        if(error)return alert('Error adding')
     }
-    addForm.reset()
-    loadPurchases()
+    addForm.reset(); loadPurchases()
 })
 
-// Edit row
-window.editRow = (id)=>{
-    const row = purchaseTable.querySelector(`tr[data-id='${id}']`)
-    if(!row) return
-    document.getElementById('purchaseDate').value=row.cells[0].innerText
-    document.getElementById('amount').value=parseFloat(row.cells[1].innerText.replace('₹',''))
-    document.getElementById('gold').value=parseFloat(row.cells[2].innerText.replace(' g',''))
+window.editRow=id=>{
+    const r=purchaseTable.querySelector(`tr[data-id='${id}']`)
+    if(!r)return
+    document.getElementById('purchaseDate').value=r.cells[0].innerText
+    document.getElementById('amount').value=parseFloat(r.cells[1].innerText.replace('₹',''))
+    document.getElementById('gold').value=parseFloat(r.cells[2].innerText.replace(' g',''))
     editingId=id
     addForm.querySelector('button').innerText='Update Purchase'
 }
 
-// Delete row
-window.deleteRow = async (id)=>{
-    if(!confirm('Are you sure you want to delete this purchase?')) return
-    const { error } = await supabase.from('gold_purchases').delete().eq('id',id)
-    if(error){ alert('Error deleting'); console.error(error); return }
+window.deleteRow=async id=>{
+    if(!confirm('Delete this record?'))return
+    const {error}=await supabase.from('gold_purchases').delete().eq('id',id)
+    if(error)return alert('Error deleting')
     loadPurchases()
 }
-
-// Recalculate summary when today's price changes
-todayPriceInput.addEventListener('input', calculateSummary)
 </script>
 </body>
 </html>
