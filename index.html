@@ -89,7 +89,7 @@ body {
   color: var(--light-gold);
 }
 .card input {
-  width: 100px;
+  width: 120px;
   padding: 6px;
   text-align: center;
   border: 1px solid var(--gold);
@@ -195,7 +195,7 @@ a { color: var(--light-gold); }
 <body>
 
 <div class="header-bar">
-  <h1>Gold Purchase Tracker</h1>
+  <h1>🏆 Gold Purchase Tracker</h1>
   <div>
     <span id="userInfo"></span>
     <button id="logout" style="display:none;">Logout</button>
@@ -222,6 +222,7 @@ a { color: var(--light-gold); }
       <div class="card">
         Today's Price ₹<input type="number" id="todayPrice" step="0.01" value="0">
         <button id="savePrice">Save</button>
+        <small id="lastUpdated" style="display:block; margin-top:4px; color:#aaa;"></small>
       </div>
       <div class="card">Profit/Loss ₹<span id="profitLoss">0</span></div>
       <div class="card">Profit % <span id="profitLossPercent">0</span>%</div>
@@ -251,6 +252,7 @@ a { color: var(--light-gold); }
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
 const supabase = createClient(
   'https://febpaanqrqgrnbyrvfxx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYnBhYW5xcnFncm5ieXJ2Znh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDUzNzMsImV4cCI6MjA3NjUyMTM3M30.dFyrWiNKqGCVDGLN9HU2IyRuI6rqAJaZGwRQjXri3mQ'
@@ -271,6 +273,7 @@ const profitLossEl = document.getElementById('profitLoss')
 const profitLossPercentEl = document.getElementById('profitLossPercent')
 const currentValueEl = document.getElementById('currentValue')
 const savePriceBtn = document.getElementById('savePrice')
+const lastUpdatedEl = document.getElementById('lastUpdated')
 
 async function checkUser() {
   const { data } = await supabase.auth.getSession()
@@ -311,9 +314,10 @@ function showApp(user) {
 }
 
 async function loadGoldPrice() {
-  const { data } = await supabase.from('gold_price').select('*').order('id', { ascending: false }).limit(1)
-  if (data.length > 0 && data[0].price > 0) {
+  const { data } = await supabase.from('gold_price').select('*').order('price_date', { ascending: false }).limit(1)
+  if (data.length > 0) {
     todayPriceInput.value = data[0].price
+    lastUpdatedEl.textContent = `Last updated: ${data[0].price_date}`
     calculateSummary()
   }
 }
@@ -321,9 +325,18 @@ async function loadGoldPrice() {
 savePriceBtn.addEventListener('click', async () => {
   const price = parseFloat(todayPriceInput.value)
   if (isNaN(price) || price <= 0) return alert('Enter a valid gold price')
-  await supabase.from('gold_price').insert([{ price }])
-  alert('Gold price saved successfully!')
-  calculateSummary()
+  const today = new Date().toISOString().split('T')[0]
+
+  const { error } = await supabase
+    .from('gold_price')
+    .upsert([{ price_date: today, price }], { onConflict: ['price_date'] })
+
+  if (error) {
+    alert('Error saving price: ' + error.message)
+  } else {
+    alert('Gold price saved successfully!')
+    loadGoldPrice()
+  }
 })
 
 async function loadPurchases() {
@@ -361,7 +374,6 @@ function calculateSummary() {
     const gold = parseFloat(row.cells[2].innerText.replace(' g', '')) || 0
     totalCost += cost; totalGold += gold
   })
-
   totalGoldEl.innerText = totalGold.toFixed(3)
   totalCostEl.innerText = formatCurrency(totalCost)
   const price = parseFloat(todayPriceInput.value)
