@@ -214,67 +214,98 @@ const SUPABASE_URL = 'https://febpaanqrqgrnbyrvfxx.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYnBhYW5xcnFncm5ieXJ2Znh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDUzNzMsImV4cCI6MjA3NjUyMTM3M30.dFyrWiNKqGCVDGLN9HU2IyRuI6rqAJaZGwRQjXri3mQ'
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-const loginDiv=document.getElementById('loginDiv'), appDiv=document.getElementById('appDiv'), loginForm=document.getElementById('loginForm')
-const signupLink=document.getElementById('signupLink'), logoutBtn=document.getElementById('logout')
-const addForm=document.getElementById('addForm'), purchaseTable=document.getElementById('purchaseTable')
-const totalGoldEl=document.getElementById('totalGold'), totalCostEl=document.getElementById('totalCost')
-const todayPriceInput=document.getElementById('todayPrice'), profitLossEl=document.getElementById('profitLoss')
-const profitLossPercentEl=document.getElementById('profitLossPercent'), currentValueEl=document.getElementById('currentValue')
-const savePriceBtn=document.getElementById('savePrice')
-let editingId=null
+const loginDiv = document.getElementById('loginDiv')
+const appDiv = document.getElementById('appDiv')
+const loginForm = document.getElementById('loginForm')
+const signupLink = document.getElementById('signupLink')
+const logoutBtn = document.getElementById('logout')
+const addForm = document.getElementById('addForm')
+const purchaseTable = document.getElementById('purchaseTable')
+const totalGoldEl = document.getElementById('totalGold')
+const totalCostEl = document.getElementById('totalCost')
+const todayPriceInput = document.getElementById('todayPrice')
+const profitLossEl = document.getElementById('profitLoss')
+const profitLossPercentEl = document.getElementById('profitLossPercent')
+const currentValueEl = document.getElementById('currentValue')
+const savePriceBtn = document.getElementById('savePrice')
+let editingId = null
 
 // AUTH
-async function checkUser(){ const {data}=await supabase.auth.getSession(); if(data.session) showApp() }
+async function checkUser() {
+  const { data } = await supabase.auth.getSession()
+  if (data.session) showApp()
+}
 checkUser()
-loginForm.addEventListener('submit',async e=>{
-    e.preventDefault()
-    const email=document.getElementById('loginEmail').value
-    const password=document.getElementById('loginPassword').value
-    const {error}=await supabase.auth.signInWithPassword({email,password})
-    if(error) return alert(error.message)
-    showApp()
-})
-signupLink.addEventListener('click',async()=>{
-    const email=prompt('Enter email:')
-    const password=prompt('Enter password:')
-    if(!email||!password)return
-    const {error}=await supabase.auth.signUp({email,password})
-    if(error) alert(error.message); else alert('Signup successful! Please log in.')
-})
-logoutBtn.addEventListener('click',async()=>{ await supabase.auth.signOut(); location.reload(); })
 
-// APP VIEW
-function showApp(){ loginDiv.style.display='none'; appDiv.style.display='block'; loadPurchases(); loadGoldPrice(); }
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault()
+  const email = document.getElementById('loginEmail').value
+  const password = document.getElementById('loginPassword').value
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) return alert(error.message)
+  showApp()
+})
 
-// Load latest gold price
-async function loadGoldPrice(){
-    const {data,error}=await supabase.from('gold_price').select('*').order('id',{ascending:false}).limit(1)
-    if(!error && data.length>0){ todayPriceInput.value=data[0].price }
+signupLink.addEventListener('click', async () => {
+  const email = prompt('Enter email:')
+  const password = prompt('Enter password:')
+  if (!email || !password) return
+  const { error } = await supabase.auth.signUp({ email, password })
+  if (error) alert(error.message)
+  else alert('Signup successful! Please log in.')
+})
+
+logoutBtn.addEventListener('click', async () => {
+  await supabase.auth.signOut()
+  location.reload()
+})
+
+function showApp() {
+  loginDiv.style.display = 'none'
+  appDiv.style.display = 'block'
+  loadPurchases()
+  loadGoldPrice()
 }
 
-// Save gold price to DB
-savePriceBtn.addEventListener('click', async ()=>{
-    const price=parseFloat(todayPriceInput.value)
-    if(isNaN(price)||price<=0){ alert('Enter a valid gold price'); return }
-    const {error}=await supabase.from('gold_price').insert([{price}])
-    if(error){ alert('Error saving price'); console.error(error); return }
-    alert('Gold price saved successfully!')
+// LOAD GOLD PRICE
+async function loadGoldPrice() {
+  const { data, error } = await supabase
+    .from('gold_price')
+    .select('*')
+    .order('id', { ascending: false })
+    .limit(1)
+  if (!error && data.length > 0 && data[0].price > 0) {
+    todayPriceInput.value = data[0].price
     calculateSummary()
-})
-
-// Load purchases
-async function loadPurchases(){
-    const {data,error}=await supabase.from('gold_purchases').select('*').order('purchase_date',{ascending:true})
-    if(error){console.error(error);return}
-    purchaseTable.innerHTML=''
-    data.forEach(p=>addRow(p))
-    calculateSummary()
+  }
 }
 
-function addRow(p){
-    const row=document.createElement('tr')
-    row.dataset.id=p.id
-    row.innerHTML=`
+// SAVE GOLD PRICE
+savePriceBtn.addEventListener('click', async () => {
+  const price = parseFloat(todayPriceInput.value)
+  if (isNaN(price) || price <= 0) return alert('Enter a valid gold price')
+  const { error } = await supabase.from('gold_price').insert([{ price }])
+  if (error) return alert('Error saving price')
+  alert('Gold price saved successfully!')
+  calculateSummary()
+})
+
+// LOAD PURCHASES
+async function loadPurchases() {
+  const { data, error } = await supabase
+    .from('gold_purchases')
+    .select('*')
+    .order('purchase_date', { ascending: true })
+  if (error) return console.error(error)
+  purchaseTable.innerHTML = ''
+  data.forEach(p => addRow(p))
+  calculateSummary()
+}
+
+function addRow(p) {
+  const row = document.createElement('tr')
+  row.dataset.id = p.id
+  row.innerHTML = `
         <td>${p.purchase_date}</td>
         <td>₹${parseFloat(p.amount).toFixed(2)}</td>
         <td>${parseFloat(p.gold).toFixed(3)} g</td>
@@ -282,61 +313,88 @@ function addRow(p){
             <button class="action-btn edit-btn" onclick="editRow(${p.id})">Edit</button>
             <button class="action-btn delete-btn" onclick="deleteRow(${p.id})">Delete</button>
         </td>`
-    purchaseTable.appendChild(row)
+  purchaseTable.appendChild(row)
 }
 
-function calculateSummary(){
-    let gold=0,cost=0
-    purchaseTable.querySelectorAll('tr').forEach(r=>{
-        cost+=parseFloat(r.cells[1].innerText.replace('₹',''))
-        gold+=parseFloat(r.cells[2].innerText.replace(' g',''))
-    })
-    totalGoldEl.innerText=gold.toFixed(3)
-    totalCostEl.innerText=cost.toFixed(2)
-    const price=parseFloat(todayPriceInput.value)
-    const profit=(gold*price)-cost
-    profitLossEl.innerText=profit.toFixed(2)
-    profitLossPercentEl.innerText=(cost>0?(profit/cost)*100:0).toFixed(2)
-    profitLossEl.style.color=profit>=0?'#00ff7f':'#ff4d4d'
-    profitLossPercentEl.style.color=profit>=0?'#00ff7f':'#ff4d4d'
-    currentValueEl.innerText=(cost+profit).toFixed(2)
-}
-todayPriceInput.addEventListener('input',calculateSummary)
+// ✅ FIXED CALCULATION LOGIC
+function calculateSummary() {
+  let totalGold = 0
+  let totalCost = 0
 
-addForm.addEventListener('submit',async e=>{
-    e.preventDefault()
-    const d=document.getElementById('purchaseDate').value
-    const a=parseFloat(document.getElementById('amount').value)
-    const g=parseFloat(document.getElementById('gold').value)
-    const {data:user}=await supabase.auth.getUser()
-    const uid=user.user.id
-    if(editingId){
-        const {error}=await supabase.from('gold_purchases').update({purchase_date:d,amount:a,gold:g}).eq('id',editingId)
-        if(error)return alert('Error updating')
-        editingId=null
-        addForm.querySelector('button').innerText='Add Purchase'
-    } else {
-        const {error}=await supabase.from('gold_purchases').insert([{purchase_date:d,amount:a,gold:g,user_id:uid}])
-        if(error)return alert('Error adding')
-    }
-    addForm.reset(); loadPurchases()
+  purchaseTable.querySelectorAll('tr').forEach(row => {
+    const amount = parseFloat(row.cells[1].innerText.replace('₹', '')) || 0
+    const gold = parseFloat(row.cells[2].innerText.replace(' g', '')) || 0
+    totalGold += gold
+    totalCost += amount
+  })
+
+  totalGoldEl.innerText = totalGold.toFixed(3)
+  totalCostEl.innerText = totalCost.toFixed(2)
+
+  const todayPrice = parseFloat(todayPriceInput.value)
+  if (!todayPrice || todayPrice <= 0 || totalGold <= 0 || totalCost <= 0) {
+    profitLossEl.innerText = "0.00"
+    profitLossPercentEl.innerText = "0.00"
+    currentValueEl.innerText = totalCost.toFixed(2)
+    profitLossEl.style.color = "#ccc"
+    profitLossPercentEl.style.color = "#ccc"
+    return
+  }
+
+  const currentValue = totalGold * todayPrice
+  const profitLoss = currentValue - totalCost
+  const profitPercent = totalCost > 0 ? (profitLoss / totalCost) * 100 : 0
+
+  profitLossEl.innerText = profitLoss.toFixed(2)
+  profitLossPercentEl.innerText = profitPercent.toFixed(2)
+  currentValueEl.innerText = currentValue.toFixed(2)
+
+  profitLossEl.style.color = profitLoss >= 0 ? '#00ff7f' : '#ff4d4d'
+  profitLossPercentEl.style.color = profitLoss >= 0 ? '#00ff7f' : '#ff4d4d'
+}
+
+todayPriceInput.addEventListener('input', calculateSummary)
+
+addForm.addEventListener('submit', async e => {
+  e.preventDefault()
+  const d = document.getElementById('purchaseDate').value
+  const a = parseFloat(document.getElementById('amount').value)
+  const g = parseFloat(document.getElementById('gold').value)
+  const { data: user } = await supabase.auth.getUser()
+  const uid = user.user.id
+  if (editingId) {
+    const { error } = await supabase
+      .from('gold_purchases')
+      .update({ purchase_date: d, amount: a, gold: g })
+      .eq('id', editingId)
+    if (error) return alert('Error updating')
+    editingId = null
+    addForm.querySelector('button').innerText = 'Add Purchase'
+  } else {
+    const { error } = await supabase
+      .from('gold_purchases')
+      .insert([{ purchase_date: d, amount: a, gold: g, user_id: uid }])
+    if (error) return alert('Error adding')
+  }
+  addForm.reset()
+  loadPurchases()
 })
 
-window.editRow=id=>{
-    const r=purchaseTable.querySelector(`tr[data-id='${id}']`)
-    if(!r)return
-    document.getElementById('purchaseDate').value=r.cells[0].innerText
-    document.getElementById('amount').value=parseFloat(r.cells[1].innerText.replace('₹',''))
-    document.getElementById('gold').value=parseFloat(r.cells[2].innerText.replace(' g',''))
-    editingId=id
-    addForm.querySelector('button').innerText='Update Purchase'
+window.editRow = id => {
+  const r = purchaseTable.querySelector(`tr[data-id='${id}']`)
+  if (!r) return
+  document.getElementById('purchaseDate').value = r.cells[0].innerText
+  document.getElementById('amount').value = parseFloat(r.cells[1].innerText.replace('₹', ''))
+  document.getElementById('gold').value = parseFloat(r.cells[2].innerText.replace(' g', ''))
+  editingId = id
+  addForm.querySelector('button').innerText = 'Update Purchase'
 }
 
-window.deleteRow=async id=>{
-    if(!confirm('Delete this record?'))return
-    const {error}=await supabase.from('gold_purchases').delete().eq('id',id)
-    if(error)return alert('Error deleting')
-    loadPurchases()
+window.deleteRow = async id => {
+  if (!confirm('Delete this record?')) return
+  const { error } = await supabase.from('gold_purchases').delete().eq('id', id)
+  if (error) return alert('Error deleting')
+  loadPurchases()
 }
 </script>
 </body>
