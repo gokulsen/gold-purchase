@@ -9,34 +9,36 @@
 <style>
 :root {
   --gold:#d4af37; --light-gold:#f6e27a; --dark-gold:#b08d2a;
-  --bg1: linear-gradient(135deg,#000,#111);
-  --card-bg: linear-gradient(145deg,#111,#1c1c1c);
+  --bg1:linear-gradient(135deg,#000,#111);
+  --card-bg:linear-gradient(145deg,#111,#1c1c1c);
   --muted:#cfcfcf;
 }
+
 body {
-  margin:0;font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto;
-  background:var(--bg1);color:var(--muted);min-height:100vh;
+  margin:0;
+  font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto;
+  background:var(--bg1);
+  color:var(--muted);
+  min-height:100vh;
 }
+
+/* Header */
 .header-bar {
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px;
   background:linear-gradient(90deg,var(--gold),var(--dark-gold));
   box-shadow:0 3px 10px rgba(0,0,0,0.4);
 }
-.header-bar h1 {
-  margin:0;color:#000;font-size:1.2rem;
-  text-shadow:0 0 8px rgba(212,175,55,0.6);
-}
+.header-bar h1 {margin:0;color:#000;font-size:1.2rem;text-shadow:0 0 8px rgba(212,175,55,0.6);}
 .header-actions{display:flex;align-items:center;gap:10px}
 #userInfo{color:#000;font-weight:600}
-#logout{
-  background:#000;border:1px solid var(--gold);color:var(--gold);
-  padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;
-}
+#logout{background:#000;border:1px solid var(--gold);color:var(--gold);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;}
 #logout:hover{background:var(--gold);color:#000}
+
+/* Layout */
 .container{max-width:1100px;margin:20px auto;padding:16px}
 
-/* Cards & Summary */
+/* Cards */
 .summary{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;margin-bottom:20px}
 .card{
   flex:1 1 calc(33.33% - 14px);min-width:220px;
@@ -46,70 +48,28 @@ body {
 }
 .card .label{font-size:13px;color:var(--muted);margin-bottom:6px}
 .card .value{font-weight:700;color:var(--light-gold);font-size:1.15rem}
-.card input{
-  background:#000;border:1px solid var(--gold);color:var(--light-gold);
-  padding:6px;border-radius:6px;text-align:center;
-}
-.card button{
-  padding:6px 10px;border-radius:6px;border:none;
-  background:linear-gradient(90deg,var(--gold),var(--dark-gold));
-  cursor:pointer;color:#000;font-weight:700;margin-left:6px;
-}
+.card input{background:#000;border:1px solid var(--gold);color:var(--light-gold);padding:6px;border-radius:6px;text-align:center;}
+.card button{padding:6px 10px;border-radius:6px;border:none;background:linear-gradient(90deg,var(--gold),var(--dark-gold));cursor:pointer;color:#000;font-weight:700;margin-left:6px;}
 
 /* Goal Tracker */
 .goal{display:flex;flex-direction:column;gap:10px;align-items:center}
 .goal-row{width:100%;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
-.goal-progress-wrap{
-  width:100%;max-width:460px;padding:10px;background:#0f0f0f;
-  border-radius:10px;border:1px solid rgba(212,175,55,0.06)
-}
-.progress-bar{
-  width:100%;height:18px;border-radius:12px;background:linear-gradient(90deg,#222,#111);
-  overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.03)
-}
-.progress-fill{
-  height:100%;width:0%;display:block;border-radius:12px;
-  background:linear-gradient(90deg,rgba(212,175,55,0.3),rgba(212,175,55,0.65));
-  box-shadow:0 6px 20px rgba(212,175,55,0.12) inset;
-  transform-origin:left center;
-  transition:width 900ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms;
-}
-.progress-glow{
-  content:"";position:absolute;top:0;left:0;height:100%;width:100%;
-  background:linear-gradient(90deg,rgba(255,255,255,0.06),rgba(255,255,255,0));
-  mix-blend-mode:screen;pointer-events:none;
-  animation:shimmer 2.4s linear infinite;opacity:0.6;
-}
+.goal-progress-wrap{width:100%;max-width:460px;padding:10px;background:#0f0f0f;border-radius:10px;border:1px solid rgba(212,175,55,0.06)}
+.progress-bar{width:100%;height:18px;border-radius:12px;background:linear-gradient(90deg,#222,#111);overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.03)}
+.progress-fill{height:100%;width:0%;display:block;border-radius:12px;background:linear-gradient(90deg,rgba(212,175,55,0.3),rgba(212,175,55,0.65));box-shadow:0 6px 20px rgba(212,175,55,0.12) inset;transform-origin:left center;transition:width 900ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms;}
+.progress-glow{content:"";position:absolute;top:0;left:0;height:100%;width:100%;background:linear-gradient(90deg,rgba(255,255,255,0.06),rgba(255,255,255,0));mix-blend-mode:screen;pointer-events:none;animation:shimmer 2.4s linear infinite;opacity:0.6;}
 @keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 
 /* Chart */
 .chart-block{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
 .chart-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.pill{
-  background:rgba(255,255,255,0.03);color:var(--muted);
-  border:1px solid rgba(255,255,255,0.03);padding:8px 12px;
-  border-radius:999px;cursor:pointer;font-weight:700;
-}
-.pill.active{
-  background:linear-gradient(90deg,var(--gold),var(--light-gold));
-  color:#000;border-color:var(--dark-gold);
-  box-shadow:0 6px 18px rgba(0,0,0,0.35);
-}
+.pill{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:700;}
+.pill.active{background:linear-gradient(90deg,var(--gold),var(--light-gold));color:#000;border-color:var(--dark-gold);box-shadow:0 6px 18px rgba(0,0,0,0.35);}
 
 /* Add Form */
-#addForm{
-  display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
-  margin:20px 0;background:var(--card-bg);border:1px solid var(--dark-gold);
-  border-radius:12px;padding:14px;box-shadow:0 0 15px rgba(212,175,55,0.08)
-}
-#addForm input{
-  background:#000;border:1px solid var(--dark-gold);color:var(--light-gold);
-  padding:8px;border-radius:8px;width:160px;text-align:center;
-}
-#addForm button{
-  background:linear-gradient(90deg,var(--gold),var(--dark-gold));
-  border:none;color:#000;font-weight:700;border-radius:8px;padding:8px 14px;cursor:pointer;
-}
+#addForm{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0;background:var(--card-bg);border:1px solid var(--dark-gold);border-radius:12px;padding:14px;box-shadow:0 0 15px rgba(212,175,55,0.08)}
+#addForm input{background:#000;border:1px solid var(--dark-gold);color:var(--light-gold);padding:8px;border-radius:8px;width:160px;text-align:center;}
+#addForm button{background:linear-gradient(90deg,var(--gold),var(--dark-gold));border:none;color:#000;font-weight:700;border-radius:8px;padding:8px 14px;cursor:pointer;}
 
 /* Table */
 table{width:100%;border-collapse:collapse;background:#111;border-radius:10px;overflow:hidden;box-shadow:0 0 18px rgba(212,175,55,0.12)}
@@ -121,22 +81,19 @@ tr:hover{background:rgba(212,175,55,0.06)}
 
 /* Toasts */
 .toaster{position:fixed;right:18px;bottom:18px;z-index:120;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-.toast{
-  min-width:220px;padding:12px 14px;border-radius:10px;color:#000;
-  background:linear-gradient(90deg,var(--gold),var(--light-gold));
-  box-shadow:0 6px 18px rgba(0,0,0,0.35);font-weight:700;
-  transform:translateY(24px);opacity:0;animation:slideFade .45s forwards;
-}
+.toast{min-width:220px;padding:12px 14px;border-radius:10px;color:#000;background:linear-gradient(90deg,var(--gold),var(--light-gold));box-shadow:0 6px 18px rgba(0,0,0,0.35);font-weight:700;transform:translateY(24px);opacity:0;animation:slideFade .45s forwards;}
 .toast.error{background:linear-gradient(90deg,#ff6b6b,#ff8a8a);color:#fff}
 @keyframes slideFade{to{transform:translateY(0);opacity:1}}
 .confetti-wrap{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:999}
 .confetti-piece{position:absolute;width:10px;height:16px;opacity:0.95;transform-origin:center;will-change:transform,opacity}
-@media (max-width:720px){.summary{flex-direction:column}.card{flex:1 1 100%}}
+
+@media(max-width:720px){.summary{flex-direction:column}.card{flex:1 1 100%}}
 </style>
 </head>
+
 <body>
   <div class="header-bar">
-    <h1>Gold Purchase Tracker</h1>
+    <h1>🏆 Gold Purchase Tracker</h1>
     <div class="header-actions">
       <span id="userInfo"></span>
       <button id="logout" style="display:none;">Logout</button>
@@ -158,11 +115,28 @@ tr:hover{background:rgba(212,175,55,0.06)}
     <!-- App -->
     <div id="appDiv" style="display:none;">
       <div class="summary">
-        <div class="card"><div class="label">Total Gold</div><div class="value"><span id="totalGold">0</span> g</div></div>
-        <div class="card"><div class="label">Total Cost</div><div class="value"><span id="totalCost">₹0.00</span></div></div>
-        <div class="card"><div class="label">Current Value</div><div class="value"><span id="currentValue">₹0.00</span></div></div>   
-		<div class="card"><div class="label">Profit / Loss</div><div class="value"><span id="profitLoss">₹0.00</span></div></div>
-        <div class="card"><div class="label">Profit %</div><div class="value"><span id="profitLossPercent">0.00</span>%</div></div>  
+        <div class="card">
+          <div class="label">Total Gold</div>
+          <div class="value"><span id="totalGold">0</span> g</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Total Cost</div>
+          <div class="value"><span id="totalCost">₹0.00</span></div>
+        </div>
+
+        <div class="card">
+          <div class="label">Current Value</div>
+          <div class="value"><span id="currentValue">₹0.00</span></div>
+        </div>
+
+        <div class="card" id="profitCard">
+          <div class="label">Profit / Loss</div>
+          <div class="value">
+            <div id="profitValue" style="font-size:1.3rem;font-weight:700;">₹0.00</div>
+            <div id="profitPercentText" style="font-size:0.85rem;color:#bbb;margin-top:4px;">—</div>
+          </div>
+        </div>
 
         <!-- Goal Tracker -->
         <div class="card">
@@ -174,22 +148,32 @@ tr:hover{background:rgba(212,175,55,0.06)}
                 <div id="goalSub" style="font-size:13px;color:#aaa">Set a target (grams & date)</div>
               </div>
             </div>
+
             <div class="goal-progress-wrap">
-              <div class="progress-bar"><span class="progress-fill" id="progressFill"><span class="progress-glow"></span></span></div>
+              <div class="progress-bar">
+                <span class="progress-fill" id="progressFill">
+                  <span class="progress-glow"></span>
+                </span>
+              </div>
               <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:#bbb">
-                <span id="goalProgressText">0%</span><span id="goalETA"></span>
+                <span id="goalProgressText">0%</span>
+                <span id="goalETA"></span>
               </div>
             </div>
+
             <div class="goal-row">
               <input id="targetGrams" type="number" step="0.001" placeholder="Target grams" style="width:150px" />
               <input id="targetDate" type="date" style="width:160px" />
               <button id="saveGoal">Save Goal</button>
             </div>
-            <div class="goal-row" style="font-size:13px;color:#bbb"><div id="goalSuggestion">—</div></div>
+
+            <div class="goal-row" style="font-size:13px;color:#bbb">
+              <div id="goalSuggestion">—</div>
+            </div>
           </div>
         </div>
-		
-		<div class="card">
+
+        <div class="card">
           <div class="label">Today's Gold Price</div>
           <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap">
             <input id="priceDate" type="date" required />
@@ -198,7 +182,6 @@ tr:hover{background:rgba(212,175,55,0.06)}
           </div>
           <small id="lastUpdated" style="color:#aaa"></small>
         </div>
-		
       </div>
 
       <div class="chart-block">
@@ -221,7 +204,9 @@ tr:hover{background:rgba(212,175,55,0.06)}
       </form>
 
       <table>
-        <thead><tr><th>Date</th><th>Amount</th><th>Gold</th><th>Action</th></tr></thead>
+        <thead>
+          <tr><th>Date</th><th>Amount</th><th>Gold</th><th>Action</th></tr>
+        </thead>
         <tbody id="purchaseTable"></tbody>
       </table>
     </div>
@@ -238,66 +223,266 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYnBhYW5xcnFncm5ieXJ2Znh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDUzNzMsImV4cCI6MjA3NjUyMTM3M30.dFyrWiNKqGCVDGLN9HU2IyRuI6rqAJaZGwRQjXri3mQ'
 )
 
-const loginDiv=document.getElementById('loginDiv'),appDiv=document.getElementById('appDiv'),loginForm=document.getElementById('loginForm'),
-signupLink=document.getElementById('signupLink'),logoutBtn=document.getElementById('logout'),userInfo=document.getElementById('userInfo'),
-priceDate=document.getElementById('priceDate'),priceValue=document.getElementById('priceValue'),savePrice=document.getElementById('savePrice'),
-lastUpdated=document.getElementById('lastUpdated'),addForm=document.getElementById('addForm'),purchaseDateInput=document.getElementById('purchaseDate'),
-amountInput=document.getElementById('amount'),goldInput=document.getElementById('gold'),purchaseTable=document.getElementById('purchaseTable'),
-totalGoldEl=document.getElementById('totalGold'),totalCostEl=document.getElementById('totalCost'),
-profitLossEl=document.getElementById('profitLoss'),profitLossPercentEl=document.getElementById('profitLossPercent'),currentValueEl=document.getElementById('currentValue'),
-filterWeek=document.getElementById('filterWeek'),filterMonth=document.getElementById('filterMonth'),filterYear=document.getElementById('filterYear'),
-targetGramsInput=document.getElementById('targetGrams'),targetDateInput=document.getElementById('targetDate'),saveGoalBtn=document.getElementById('saveGoal'),
-goalSummary=document.getElementById('goalSummary'),goalSub=document.getElementById('goalSub'),goalProgressText=document.getElementById('goalProgressText'),
-goalSuggestion=document.getElementById('goalSuggestion'),progressFill=document.getElementById('progressFill'),
-confettiWrap=document.getElementById('confettiWrap'),toaster=document.getElementById('toaster')
+/* ---------- UTILITIES ---------- */
+const formatCurrency = n => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR' }).format(n || 0)
+const unformatCurrency = s => parseFloat(s.replace(/[₹,\s]/g,'')) || 0
+const formatDateISO = d => new Date(d).toISOString().split('T')[0]
+function showToast(msg, type='success', timeout=3500){
+  const t=document.createElement('div')
+  t.className='toast'+(type==='error'?' error':'')
+  t.innerText=msg
+  toaster.appendChild(t)
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-10px)';setTimeout(()=>t.remove(),400)},timeout)
+}
+
+/* ---------- DOM REFS ---------- */
+const loginDiv=document.getElementById('loginDiv')
+const appDiv=document.getElementById('appDiv')
+const loginForm=document.getElementById('loginForm')
+const signupLink=document.getElementById('signupLink')
+const logoutBtn=document.getElementById('logout')
+const userInfo=document.getElementById('userInfo')
+const purchaseDateInput=document.getElementById('purchaseDate')
+const amountInput=document.getElementById('amount')
+const goldInput=document.getElementById('gold')
+const purchaseTable=document.getElementById('purchaseTable')
+const totalGoldEl=document.getElementById('totalGold')
+const totalCostEl=document.getElementById('totalCost')
+const currentValueEl=document.getElementById('currentValue')
+const priceDate=document.getElementById('priceDate')
+const priceValue=document.getElementById('priceValue')
+const savePrice=document.getElementById('savePrice')
+const lastUpdated=document.getElementById('lastUpdated')
+const targetGramsInput=document.getElementById('targetGrams')
+const targetDateInput=document.getElementById('targetDate')
+const saveGoalBtn=document.getElementById('saveGoal')
+const progressFill=document.getElementById('progressFill')
+const goalProgressText=document.getElementById('goalProgressText')
+const goalSuggestion=document.getElementById('goalSuggestion')
+const confettiWrap=document.getElementById('confettiWrap')
+const toaster=document.getElementById('toaster')
+const filterWeek=document.getElementById('filterWeek')
+const filterMonth=document.getElementById('filterMonth')
+const filterYear=document.getElementById('filterYear')
 
 let goldChart=null,chartFilter='month',currentUser=null,currentGoal=null,goalCelebrationFired=false
 
-function showToast(msg,type='success',timeout=3500){const t=document.createElement('div');t.className='toast'+(type==='error'?' error':'');t.innerText=msg;toaster.appendChild(t);setTimeout(()=>{t.style.transition='opacity .35s, transform .35s';t.style.opacity='0';t.style.transform='translateY(-10px)';setTimeout(()=>t.remove(),420)},timeout)}
-function formatDateISO(d){return new Date(d).toISOString().split('T')[0]}
-const formatCurrency=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n)
-function unformatCurrency(s){return parseFloat(s.replace(/[₹,\s]/g,''))||0}
-function setTodayOnDateInput(){purchaseDateInput.value=formatDateISO(new Date())}
-function setPriceDateDefault(){priceDate.value=formatDateISO(new Date())}
-function setAmountFormatting(){amountInput.addEventListener('focus',()=>{amountInput.value=unformatCurrency(amountInput.value)||''});amountInput.addEventListener('blur',()=>{amountInput.value=formatCurrency(unformatCurrency(amountInput.value))})}
-setTodayOnDateInput();setPriceDateDefault();setAmountFormatting()
-
-async function checkUser(){const {data}=await supabase.auth.getSession();if(data?.session){currentUser=data.session.user;showApp(currentUser)}}
+/* ---------- AUTH ---------- */
+async function checkUser(){
+  const { data } = await supabase.auth.getSession()
+  if(data?.session){currentUser=data.session.user;showApp(currentUser)}
+}
 checkUser()
 
-loginForm.addEventListener('submit',async e=>{e.preventDefault();const email=document.getElementById('loginEmail').value,password=document.getElementById('loginPassword').value;const {data,error}=await supabase.auth.signInWithPassword({email,password});if(error)return showToast(error.message,'error');currentUser=data.user;showToast('Login successful');showApp(currentUser)})
-signupLink.addEventListener('click',async e=>{e.preventDefault();const email=prompt('Email:'),pw=prompt('Password:');if(!email||!pw)return;const {error}=await supabase.auth.signUp({email,password:pw});error?showToast(error.message,'error'):showToast('Signup success!')})
+loginForm.addEventListener('submit',async e=>{
+  e.preventDefault()
+  const email=document.getElementById('loginEmail').value
+  const pw=document.getElementById('loginPassword').value
+  const { data,error }=await supabase.auth.signInWithPassword({email,password:pw})
+  if(error) return showToast(error.message,'error')
+  currentUser=data.user
+  showToast('Login successful')
+  showApp(currentUser)
+})
+signupLink.addEventListener('click',async e=>{
+  e.preventDefault()
+  const email=prompt('Email:')
+  const pw=prompt('Password:')
+  if(!email||!pw)return
+  const {error}=await supabase.auth.signUp({email,password:pw})
+  error?showToast(error.message,'error'):showToast('Signup success!')
+})
 logoutBtn.addEventListener('click',async()=>{await supabase.auth.signOut();location.reload()})
 
-function showApp(user){loginDiv.style.display='none';appDiv.style.display='block';logoutBtn.style.display='inline-block';userInfo.textContent=user.email;loadPurchases();loadGoldPrice(chartFilter);loadUserGoal()}
+/* ---------- APP ---------- */
+function showApp(user){
+  loginDiv.style.display='none'
+  appDiv.style.display='block'
+  logoutBtn.style.display='inline-block'
+  userInfo.textContent=user.email
+  loadPurchases()
+  loadGoldPrice(chartFilter)
+  loadUserGoal()
+}
 
-/* --- Purchases --- */
-async function loadPurchases(){const {data,error}=await supabase.from('gold_purchases').select('*').order('purchase_date',{ascending:true});if(error)return showToast(error.message,'error');purchaseTable.innerHTML='';data.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${p.purchase_date}</td><td>${formatCurrency(p.amount)}</td><td>${p.gold} g</td><td><button class='delete-btn' onclick='deletePurchase(${p.id})'>Delete</button></td>`;purchaseTable.appendChild(tr)});calculateSummary()}
-window.deletePurchase=async id=>{const {error}=await supabase.from('gold_purchases').delete().eq('id',id);if(error)return showToast(error.message,'error');showToast('Deleted');loadPurchases();loadUserGoal()}
-addForm.addEventListener('submit',async e=>{e.preventDefault();const purchase_date=purchaseDateInput.value,amount=unformatCurrency(amountInput.value),gold=parseFloat(goldInput.value);const {data:userData}=await supabase.auth.getUser();const user_id=userData?.user?.id||null;const {error}=await supabase.from('gold_purchases').insert([{purchase_date,amount,gold,user_id}]);if(error)return showToast(error.message,'error');showToast('Purchase added');addForm.reset();setTodayOnDateInput();loadPurchases();loadUserGoal()})
+/* ---------- PURCHASES ---------- */
+async function loadPurchases(){
+  const {data,error}=await supabase.from('gold_purchases').select('*').order('purchase_date',{ascending:true})
+  if(error)return showToast(error.message,'error')
+  purchaseTable.innerHTML=''
+  data.forEach(p=>{
+    const tr=document.createElement('tr')
+    tr.innerHTML=`<td>${p.purchase_date}</td><td>${formatCurrency(p.amount)}</td><td>${p.gold} g</td><td><button class='delete-btn' onclick='deletePurchase(${p.id})'>Delete</button></td>`
+    purchaseTable.appendChild(tr)
+  })
+  calculateSummary()
+}
+window.deletePurchase=async id=>{
+  const {error}=await supabase.from('gold_purchases').delete().eq('id',id)
+  if(error)return showToast(error.message,'error')
+  showToast('Deleted')
+  loadPurchases();loadUserGoal()
+}
 
-/* --- Chart --- */
+/* Add purchase */
+addForm.addEventListener('submit',async e=>{
+  e.preventDefault()
+  const purchase_date=purchaseDateInput.value
+  const amount=unformatCurrency(amountInput.value)
+  const gold=parseFloat(goldInput.value)
+  const {data:userData}=await supabase.auth.getUser()
+  const user_id=userData?.user?.id||null
+  const {error}=await supabase.from('gold_purchases').insert([{purchase_date,amount,gold,user_id}])
+  if(error)return showToast(error.message,'error')
+  showToast('Purchase added')
+  addForm.reset();loadPurchases();loadUserGoal()
+})
+
+/* ---------- GOLD PRICE ---------- */
 function computeStartDate(f){const t=new Date(),s=new Date(t);if(f==='week')s.setDate(t.getDate()-6);else if(f==='month')s.setDate(t.getDate()-29);else s.setDate(t.getDate()-364);return formatDateISO(s)}
-async function loadGoldPrice(f='month'){const s=computeStartDate(f);const {data,error}=await supabase.from('gold_price').select('*').gte('price_date',s).order('price_date',{ascending:true});if(error)return showToast(error.message,'error');drawGoldChart(data);if(data?.length){const l=data[data.length-1];priceValue.value=l.price;priceDate.value=l.price_date;lastUpdated.textContent=`Last updated: ${l.price_date}`}calculateSummary()}
-function drawGoldChart(data){const ctx=document.getElementById('goldChart').getContext('2d');const labels=data.map(d=>d.price_date),prices=data.map(d=>d.price);if(goldChart)goldChart.destroy();goldChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{data:prices,borderColor:'#d4af37',backgroundColor:'rgba(212,175,55,0.08)',fill:true,tension:.2}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#ccc'}},y:{ticks:{color:'#ccc'}}}}})}
+async function loadGoldPrice(f='month'){
+  const s=computeStartDate(f)
+  const {data,error}=await supabase.from('gold_price').select('*').gte('price_date',s).order('price_date',{ascending:true})
+  if(error)return showToast(error.message,'error')
+  drawGoldChart(data)
+  if(data?.length){
+    const l=data[data.length-1]
+    priceValue.value=l.price
+    priceDate.value=l.price_date
+    lastUpdated.textContent=`Last updated: ${l.price_date}`
+  }
+  calculateSummary()
+}
+function drawGoldChart(data){
+  const ctx=document.getElementById('goldChart').getContext('2d')
+  const labels=data.map(d=>d.price_date),prices=data.map(d=>d.price)
+  if(goldChart)goldChart.destroy()
+  goldChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{data:prices,borderColor:'#d4af37',backgroundColor:'rgba(212,175,55,0.08)',fill:true,tension:.2}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#ccc'}},y:{ticks:{color:'#ccc'}}}}})
+}
 filterWeek.onclick=()=>{chartFilter='week';filterWeek.classList.add('active');filterMonth.classList.remove('active');filterYear.classList.remove('active');loadGoldPrice('week')}
 filterMonth.onclick=()=>{chartFilter='month';filterMonth.classList.add('active');filterWeek.classList.remove('active');filterYear.classList.remove('active');loadGoldPrice('month')}
 filterYear.onclick=()=>{chartFilter='year';filterYear.classList.add('active');filterWeek.classList.remove('active');filterMonth.classList.remove('active');loadGoldPrice('year')}
-savePrice.onclick=async()=>{const p=parseFloat(priceValue.value),d=priceDate.value;if(!p)return showToast('Invalid price','error');const {error}=await supabase.from('gold_price').upsert([{price_date:d,price:p}],{onConflict:['price_date']});if(error)return showToast(error.message,'error');showToast('Price saved');loadGoldPrice(chartFilter)}
+savePrice.onclick=async()=>{
+  const p=parseFloat(priceValue.value),d=priceDate.value
+  if(!p)return showToast('Invalid price','error')
+  const {error}=await supabase.from('gold_price').upsert([{price_date:d,price:p}],{onConflict:['price_date']})
+  if(error)return showToast(error.message,'error')
+  showToast('Price saved');loadGoldPrice(chartFilter)
+}
 
-/* --- Summary --- */
-function calculateSummary(){let totalGold=0,totalCost=0;purchaseTable.querySelectorAll('tr').forEach(tr=>{const tds=tr.querySelectorAll('td');totalGold+=parseFloat(tds[2].innerText)||0;totalCost+=unformatCurrency(tds[1].innerText)});totalGoldEl.innerText=totalGold.toFixed(3);totalCostEl.innerText=formatCurrency(totalCost);const price=parseFloat(priceValue.value);if(!price){profitLossEl.innerText='₹0';currentValueEl.innerText=formatCurrency(totalCost)}else{const currVal=totalGold*price,profit=currVal-totalCost,pct=(profit/totalCost)*100;profitLossEl.innerText=formatCurrency(profit);profitLossPercentEl.innerText=pct.toFixed(2);currentValueEl.innerText=formatCurrency(currVal)}updateGoalProgress()}
+/* ---------- SUMMARY ---------- */
+function calculateSummary(){
+  let totalGold=0,totalCost=0
+  purchaseTable.querySelectorAll('tr').forEach(tr=>{
+    const tds=tr.querySelectorAll('td')
+    totalGold+=parseFloat(tds[2].innerText)||0
+    totalCost+=unformatCurrency(tds[1].innerText)
+  })
+  totalGoldEl.innerText=totalGold.toFixed(3)
+  totalCostEl.innerText=formatCurrency(totalCost)
 
-/* --- Goal Tracker --- */
-async function loadUserGoal(){if(!currentUser)return;const {data,error}=await supabase.from('user_goals').select('*').eq('user_id',currentUser.id).limit(1);if(error)return;currentGoal=data[0]||null;if(currentGoal){targetGramsInput.value=currentGoal.target_grams;targetDateInput.value=currentGoal.target_date;goalSummary.innerText=`Target: ${currentGoal.target_grams}g by ${currentGoal.target_date}`;}else{goalSummary.innerText='No goal set';goalSub.innerText='Set a target';}updateGoalProgress()}
-async function saveGoal(){if(!currentUser)return showToast('Not signed in','error');const tg=parseFloat(targetGramsInput.value),td=targetDateInput.value;if(!tg||!td)return showToast('Invalid goal','error');const {data}=await supabase.from('user_goals').select('*').eq('user_id',currentUser.id).limit(1);if(data?.length){await supabase.from('user_goals').update({target_grams:tg,target_date:td}).eq('id',data[0].id);showToast('Goal updated');}else{await supabase.from('user_goals').insert([{user_id:currentUser.id,target_grams:tg,target_date:td}]);showToast('Goal saved');}loadUserGoal()}
+  const price=parseFloat(priceValue.value)
+  const profitValueEl=document.getElementById('profitValue')
+  const profitPercentText=document.getElementById('profitPercentText')
+
+  if(!price||price<=0||totalGold<=0||totalCost<=0){
+    profitValueEl.innerText="₹0.00"
+    profitPercentText.innerText="—"
+    profitValueEl.style.color="#ccc"
+    currentValueEl.innerText=formatCurrency(totalCost)
+    return
+  }
+
+  const currentValue=totalGold*price
+  const profit=currentValue-totalCost
+  const percent=(profit/totalCost)*100
+  const isGain=profit>=0
+  profitValueEl.style.color=isGain?"lightgreen":"#ff6666"
+  const sign=isGain?"+":"–"
+  const word=isGain?"gain":"drop"
+
+  profitValueEl.innerText=formatCurrency(profit)
+  profitPercentText.innerHTML=`${sign}${Math.abs(percent).toFixed(2)} % <span style="color:#aaa;">${word}</span>`
+  currentValueEl.innerText=formatCurrency(currentValue)
+}
+
+/* ---------- GOAL TRACKER ---------- */
+async function loadUserGoal(){
+  if(!currentUser)return
+  const {data,error}=await supabase.from('user_goals').select('*').eq('user_id',currentUser.id).limit(1)
+  if(error)return
+  currentGoal=data[0]||null
+  if(currentGoal){
+    targetGramsInput.value=currentGoal.target_grams
+    targetDateInput.value=currentGoal.target_date
+    document.getElementById('goalSummary').innerText=`Target: ${currentGoal.target_grams}g by ${currentGoal.target_date}`
+  } else {
+    document.getElementById('goalSummary').innerText='No goal set'
+  }
+  updateGoalProgress()
+}
+async function saveGoal(){
+  if(!currentUser)return showToast('Not signed in','error')
+  const tg=parseFloat(targetGramsInput.value),td=targetDateInput.value
+  if(!tg||!td)return showToast('Invalid goal','error')
+  const {data}=await supabase.from('user_goals').select('*').eq('user_id',currentUser.id).limit(1)
+  if(data?.length){
+    await supabase.from('user_goals').update({target_grams:tg,target_date:td}).eq('id',data[0].id)
+    showToast('Goal updated')
+  } else {
+    await supabase.from('user_goals').insert([{user_id:currentUser.id,target_grams:tg,target_date:td}])
+    showToast('Goal saved')
+  }
+  loadUserGoal()
+}
 saveGoalBtn.addEventListener('click',()=>saveGoal())
 
-function updateGoalProgress(){if(!currentGoal){progressFill.style.width='0%';goalProgressText.innerText='0%';goalSuggestion.innerText='No goal set';return}
-let totalGold=0;purchaseTable.querySelectorAll('tr').forEach(tr=>{totalGold+=parseFloat(tr.children[2].innerText)||0})
-const pct=Math.min(100,(totalGold/currentGoal.target_grams)*100);progressFill.style.width=pct+'%';goalProgressText.innerText=`${pct.toFixed(1)}% (${totalGold.toFixed(2)} / ${currentGoal.target_grams}g)`
-const rem=Math.max(0,currentGoal.target_grams-totalGold),days=(new Date(currentGoal.target_date)-new Date())/86400000;if(rem<=0){goalSuggestion.innerText='Goal achieved 🎉';triggerGoalAchieved()}else if(days<=0){goalSuggestion.innerText=`Target date passed; ${rem.toFixed(2)}g left.`}else{const gpm=rem/Math.max(1,days/30),gpw=rem/Math.max(1,days/7);goalSuggestion.innerText=`Invest ~${gpm.toFixed(2)}g/month or ${gpw.toFixed(2)}g/week`}}
-function triggerGoalAchieved(){if(goalCelebrationFired)return;goalCelebrationFired=true;showToast('🎉 Goal Achieved!');const colors=['#d4af37','#f6e27a','#ffd966','#b08d2a'];for(let i=0;i<70;i++){const e=document.createElement('div');e.className='confetti-piece';e.style.background=colors[Math.random()*colors.length|0];e.style.left=Math.random()*100+'%';e.style.top='-10%';confettiWrap.appendChild(e);const dx=(Math.random()-.5)*200,dur=2000+Math.random()*1600;e.animate([{transform:`translate3d(0,0,0) rotate(${Math.random()*360}deg)`},{transform:`translate3d(${dx}px,${innerHeight+100}px,0) rotate(${Math.random()*720}deg)`,opacity:0.3}],{duration:dur,easing:'ease-out'});setTimeout(()=>e.remove(),dur+500)}setTimeout(()=>goalCelebrationFired=false,8000)}
+function updateGoalProgress(){
+  if(!currentGoal){
+    progressFill.style.width='0%'
+    goalProgressText.innerText='0%'
+    goalSuggestion.innerText='No goal set'
+    return
+  }
+  let totalGold=0
+  purchaseTable.querySelectorAll('tr').forEach(tr=>{totalGold+=parseFloat(tr.children[2].innerText)||0})
+  const pct=Math.min(100,(totalGold/currentGoal.target_grams)*100)
+  progressFill.style.width=pct+'%'
+  goalProgressText.innerText=`${pct.toFixed(1)}% (${totalGold.toFixed(2)} / ${currentGoal.target_grams}g)`
+  const rem=Math.max(0,currentGoal.target_grams-totalGold)
+  const days=(new Date(currentGoal.target_date)-new Date())/86400000
+  if(rem<=0){
+    goalSuggestion.innerText='Goal achieved 🎉'
+    triggerGoalAchieved()
+  } else if(days<=0){
+    goalSuggestion.innerText=`Target date passed; ${rem.toFixed(2)}g left.`
+  } else {
+    const gpm=rem/Math.max(1,days/30),gpw=rem/Math.max(1,days/7)
+    goalSuggestion.innerText=`Invest ~${gpm.toFixed(2)}g/month or ${gpw.toFixed(2)}g/week`
+  }
+}
+
+function triggerGoalAchieved(){
+  if(goalCelebrationFired)return
+  goalCelebrationFired=true
+  showToast('🎉 Goal Achieved!')
+  const colors=['#d4af37','#f6e27a','#ffd966','#b08d2a']
+  for(let i=0;i<70;i++){
+    const e=document.createElement('div')
+    e.className='confetti-piece'
+    e.style.background=colors[Math.random()*colors.length|0]
+    e.style.left=Math.random()*100+'%'
+    e.style.top='-10%'
+    confettiWrap.appendChild(e)
+    const dx=(Math.random()-.5)*200
+    const dur=2000+Math.random()*1600
+    e.animate([{transform:`translate3d(0,0,0) rotate(${Math.random()*360}deg)`},
+               {transform:`translate3d(${dx}px,${innerHeight+100}px,0) rotate(${Math.random()*720}deg)`,opacity:0.3}],
+              {duration:dur,easing:'ease-out'})
+    setTimeout(()=>e.remove(),dur+500)
+  }
+  setTimeout(()=>goalCelebrationFired=false,8000)
+}
 </script>
 </body>
 </html>
