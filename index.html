@@ -3,73 +3,89 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Gold Purchase Tracker — Goal Planner</title>
+<title>Gold Purchase Tracker — Classic Black–Gold</title>
+
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-  --gold:#d4af37; --light-gold:#f6e27a; --dark-gold:#b08d2a;
-  --bg1:linear-gradient(135deg,#000,#111);
-  --card-bg:linear-gradient(145deg,#111,#1c1c1c);
+:root{
+  --gold:#d4af37;
+  --light-gold:#f6e27a;
+  --dark-gold:#b08d2a;
+  --bg-grad: linear-gradient(135deg,#000,#111);
+  --card-grad: linear-gradient(145deg,#111,#1c1c1c);
   --muted:#cfcfcf;
 }
 
-body {
+/* Reset + base */
+*{box-sizing:border-box}
+body{
   margin:0;
-  font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto;
-  background:var(--bg1);
+  font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background:var(--bg-grad);
   color:var(--muted);
+  -webkit-font-smoothing:antialiased;
   min-height:100vh;
 }
 
 /* Header */
-.header-bar {
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px;
+.header-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px;
   background:linear-gradient(90deg,var(--gold),var(--dark-gold));
-  box-shadow:0 3px 10px rgba(0,0,0,0.4);
+  box-shadow:0 3px 12px rgba(0,0,0,0.45);
 }
-.header-bar h1 {margin:0;color:#000;font-size:1.2rem;text-shadow:0 0 8px rgba(212,175,55,0.6);}
-.header-actions{display:flex;align-items:center;gap:10px}
-#userInfo{color:#000;font-weight:600}
-#logout{background:#000;border:1px solid var(--gold);color:var(--gold);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;}
-#logout:hover{background:var(--gold);color:#000}
+.header-bar h1{
+  margin:0;color:#000;font-size:1.15rem;font-weight:700;
+  text-shadow:0 0 8px rgba(212,175,55,0.55);
+}
+.header-actions{display:flex;align-items:center;gap:12px;position:relative}
+#userInfoBtn{
+  display:none;
+  background:rgba(0,0,0,0.05);
+  border:1px solid rgba(0,0,0,0.06);
+  padding:8px 12px;border-radius:10px;color:#000;font-weight:700;cursor:pointer;
+}
 
-/* Layout */
+/* Dropdown (only logout) */
+.profile-dropdown{
+  position:absolute;right:0;top:46px;min-width:200px;background:#0f0f0f;border:1px solid rgba(212,175,55,0.12);
+  border-radius:10px;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,0.6);display:none;z-index:999;
+  transform-origin:top right;opacity:0;transform:translateY(-6px) scale(.98);
+}
+.profile-dropdown.active{display:block;opacity:1;transform:translateY(0) scale(1);transition:all .16s ease}
+.profile-dropdown .item{display:block;padding:10px 12px;border-radius:8px;color:var(--muted);text-decoration:none;cursor:pointer}
+.profile-dropdown .item:hover{background:rgba(212,175,55,0.06);color:var(--light-gold)}
+.profile-dropdown .logout{color:#ffb3b3}
+
+/* Layout container */
 .container{max-width:1100px;margin:20px auto;padding:16px}
 
-/* Cards */
+/* Summary cards */
 .summary{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;margin-bottom:20px}
 .card{
   flex:1 1 calc(33.33% - 14px);min-width:220px;
-  background:var(--card-bg);border-radius:12px;padding:14px;
-  border:1px solid var(--dark-gold);text-align:center;
-  box-shadow:0 0 18px rgba(212,175,55,0.12);
+  background:var(--card-grad);border-radius:12px;padding:14px;
+  border:1px solid var(--dark-gold);text-align:center;box-shadow:0 0 18px rgba(212,175,55,0.12);
 }
 .card .label{font-size:13px;color:var(--muted);margin-bottom:6px}
 .card .value{font-weight:700;color:var(--light-gold);font-size:1.15rem}
-.card input{background:#000;border:1px solid var(--gold);color:var(--light-gold);padding:6px;border-radius:6px;text-align:center;}
-.card button{padding:6px 10px;border-radius:6px;border:none;background:linear-gradient(90deg,var(--gold),var(--dark-gold));cursor:pointer;color:#000;font-weight:700;margin-left:6px;}
+.card input{background:#000;border:1px solid var(--gold);color:var(--light-gold);padding:6px;border-radius:6px;text-align:center}
+.card button{padding:6px 10px;border-radius:6px;border:none;background:linear-gradient(90deg,var(--gold),var(--dark-gold));cursor:pointer;color:#000;font-weight:700;margin-left:6px}
 
-/* Goal Tracker */
-.goal{display:flex;flex-direction:column;gap:10px;align-items:center}
-.goal-row{width:100%;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
-.goal-progress-wrap{width:100%;max-width:460px;padding:10px;background:#0f0f0f;border-radius:10px;border:1px solid rgba(212,175,55,0.06)}
-.progress-bar{width:100%;height:18px;border-radius:12px;background:linear-gradient(90deg,#222,#111);overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.03)}
-.progress-fill{height:100%;width:0%;display:block;border-radius:12px;background:linear-gradient(90deg,rgba(212,175,55,0.3),rgba(212,175,55,0.65));box-shadow:0 6px 20px rgba(212,175,55,0.12) inset;transform-origin:left center;transition:width 900ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms;}
-.progress-glow{content:"";position:absolute;top:0;left:0;height:100%;width:100%;background:linear-gradient(90deg,rgba(255,255,255,0.06),rgba(255,255,255,0));mix-blend-mode:screen;pointer-events:none;animation:shimmer 2.4s linear infinite;opacity:0.6;}
-@keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
-
-/* Chart */
+/* Chart area */
 .chart-block{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
 .chart-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.pill{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:700;}
-.pill.active{background:linear-gradient(90deg,var(--gold),var(--light-gold));color:#000;border-color:var(--dark-gold);box-shadow:0 6px 18px rgba(0,0,0,0.35);}
+.pill{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:700}
+.pill.active{background:linear-gradient(90deg,var(--gold),var(--light-gold));color:#000;border-color:var(--dark-gold);box-shadow:0 6px 18px rgba(0,0,0,0.35)}
 
-/* Add Form */
-#addForm{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0;background:var(--card-bg);border:1px solid var(--dark-gold);border-radius:12px;padding:14px;box-shadow:0 0 15px rgba(212,175,55,0.08)}
-#addForm input{background:#000;border:1px solid var(--dark-gold);color:var(--light-gold);padding:8px;border-radius:8px;width:160px;text-align:center;}
-#addForm button{background:linear-gradient(90deg,var(--gold),var(--dark-gold));border:none;color:#000;font-weight:700;border-radius:8px;padding:8px 14px;cursor:pointer;}
+/* Add purchase */
+#addForm{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0;background:var(--card-grad);border:1px solid var(--dark-gold);border-radius:12px;padding:14px;box-shadow:0 0 15px rgba(212,175,55,0.08)}
+#addForm input{background:#000;border:1px solid var(--dark-gold);color:var(--light-gold);padding:8px;border-radius:8px;width:160px;text-align:center}
+#addForm button{background:linear-gradient(90deg,var(--gold),var(--dark-gold));border:none;color:#000;font-weight:700;border-radius:8px;padding:8px 14px;cursor:pointer}
 
 /* Table */
 table{width:100%;border-collapse:collapse;background:#111;border-radius:10px;overflow:hidden;box-shadow:0 0 18px rgba(212,175,55,0.12)}
@@ -77,208 +93,135 @@ th,td{padding:12px;text-align:center;color:var(--muted)}
 th{background:linear-gradient(90deg,var(--gold),var(--dark-gold));color:#000}
 tr:nth-child(even){background:#171717}
 tr:hover{background:rgba(212,175,55,0.06)}
-.delete-btn{padding:6px 8px;border-radius:6px;border:none;cursor:pointer;background:#dc3545;color:#fff}
+.action-btn{padding:6px 8px;border-radius:6px;border:none;cursor:pointer}
+.delete-btn{background:#dc3545;color:#fff}
+
+/* Auth (login/signup/reset) */
+.auth-container{max-width:420px;margin:60px auto;background:#111;border-radius:12px;padding:0;overflow:hidden;border:1px solid rgba(212,175,55,0.12)}
+.auth-card{display:none;padding:26px;text-align:center}
+.auth-card.active{display:block}
+.auth-form input{width:100%;margin:8px 0;padding:10px;border-radius:8px;border:1px solid var(--dark-gold);background:#000;color:var(--light-gold);text-align:center}
+.auth-form button{width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--gold),var(--dark-gold));color:#000;font-weight:700;cursor:pointer;margin-top:8px}
+
+/* Goal progress */
+.goal-progress-wrap{width:100%;max-width:460px;padding:10px;background:#0f0f0f;border-radius:10px;border:1px solid rgba(212,175,55,0.06)}
+.progress-bar{width:100%;height:18px;border-radius:12px;background:linear-gradient(90deg,#222,#111);overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.03)}
+.progress-fill{height:100%;width:0%;display:block;border-radius:12px;background:linear-gradient(90deg,rgba(212,175,55,0.32),rgba(212,175,55,0.65));box-shadow:0 6px 20px rgba(212,175,55,0.12) inset;transform-origin:left center;transition:width 900ms cubic-bezier(.2,.9,.2,1)}
+.progress-glow{position:absolute;top:0;left:0;height:100%;width:100%;background:linear-gradient(90deg,rgba(255,255,255,0.06),rgba(255,255,255,0));mix-blend-mode:screen;pointer-events:none;opacity:0.6;animation:shimmer 2.4s linear infinite}
+@keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+
+/* Modal backdrop (for nothing now, but keep) */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:120}
+.modal{background:#111;border:1px solid var(--gold);padding:18px;border-radius:10px;max-width:420px;min-width:260px;color:var(--muted)}
+.modal h3{margin:0 0 8px;color:var(--gold)}
+.modal p{margin:0 0 12px}
 
 /* Toasts */
-.toaster{position:fixed;right:18px;bottom:18px;z-index:120;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-.toast{min-width:220px;padding:12px 14px;border-radius:10px;color:#000;background:linear-gradient(90deg,var(--gold),var(--light-gold));box-shadow:0 6px 18px rgba(0,0,0,0.35);font-weight:700;transform:translateY(24px);opacity:0;animation:slideFade .45s forwards;}
+.toaster{position:fixed;right:18px;bottom:18px;z-index:150;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.toast{min-width:220px;padding:12px 14px;border-radius:10px;color:#000;background:linear-gradient(90deg,var(--gold),var(--light-gold));box-shadow:0 6px 18px rgba(0,0,0,0.35);font-weight:700;transform:translateY(24px);opacity:0;animation:slideFade .45s forwards}
 .toast.error{background:linear-gradient(90deg,#ff6b6b,#ff8a8a);color:#fff}
 @keyframes slideFade{to{transform:translateY(0);opacity:1}}
-.confetti-wrap{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:999}
-.confetti-piece{position:absolute;width:10px;height:16px;opacity:0.95;transform-origin:center;will-change:transform,opacity}
 
-.auth-card {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  padding: 28px 24px;
-  animation: fadeSlide 0.4s ease;
-}
-
-.auth-card.active {
-  display: flex;
-}
-
-.auth-form input {
-  width: 100%;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--dark-gold);
-  background: #000;
-  color: var(--light-gold);
-  text-align: center;
-}
-
-.auth-form button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(90deg, var(--gold), var(--dark-gold));
-  color: #000;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.auth-form button:hover {
-  box-shadow: 0 0 15px rgba(212,175,55,0.4);
-}
-
-.auth-toggle {
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-top: 10px;
-}
-
-.auth-toggle a {
-  color: var(--light-gold);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.auth-card h2 {
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.auth-card button {
-  background: linear-gradient(90deg, var(--gold), var(--dark-gold));
-  transition: all 0.3s ease;
-}
-
-.auth-card button:hover {
-  box-shadow: 0 0 15px rgba(212,175,55,0.6);
-  transform: translateY(-1px);
-}
-
-
-@keyframes fadeSlide {
-  from {opacity: 0; transform: translateY(15px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-
-@media(max-width:720px){.summary{flex-direction:column}.card{flex:1 1 100%}}
+/* small screens */
+@media(max-width:1024px){ .card{flex:1 1 calc(50% - 14px)} }
+@media(max-width:720px){ .summary{flex-direction:column} .card{flex:1 1 100%} .header-bar h1{font-size:1rem} .profile-dropdown{right:8px} }
 </style>
 </head>
-
 <body>
+  <!-- Header -->
   <div class="header-bar">
     <h1>Gold Purchase Tracker</h1>
     <div class="header-actions">
-      <span id="userInfo"></span>
-      <button id="logout" style="display:none;">Logout</button>
+      <button id="userInfoBtn">user@example.com ▾</button>
+
+      <!-- dropdown: just logout -->
+      <div id="profileDropdown" class="profile-dropdown" aria-hidden="true">
+        <div id="dropdownEmail" class="item" style="font-weight:700;color:#fff;cursor:default"></div>
+        <div id="dropdownLogout" class="item logout">Logout 🚪</div>
+      </div>
     </div>
   </div>
 
   <div class="container">
-    <!-- Auth Container -->
-	<div id="authContainer" class="auth-container">
-	  <!-- LOGIN -->
-	  <div id="loginDiv" class="auth-card active">
-		<h2 style="color:var(--gold)">Login</h2>
-		<form id="loginForm" class="auth-form">
-		  <input id="loginEmail" type="email" placeholder="Email" required />
-		  <input id="loginPassword" type="password" placeholder="Password" required />
-		  <button type="submit">Login</button>
-		</form>
-		<p class="auth-toggle">
-		  Don’t have an account? <a href="#" id="showSignup">Sign up</a>
-		</p>
-	  </div>
+    <!-- AUTH AREA -->
+    <div id="authContainer" class="auth-container">
+      <!-- login -->
+      <div id="loginDiv" class="auth-card active">
+        <h2 style="color:var(--gold)">Welcome</h2>
+        <form id="loginForm" class="auth-form">
+          <input id="loginEmail" type="email" placeholder="Email" required />
+          <input id="loginPassword" type="password" placeholder="Password" required />
+          <button type="submit">Login</button>
+        </form>
+        <a href="#" id="forgotPassword" style="display:block;margin-top:8px;color:var(--light-gold)">Forgot Password?</a>
+        <p style="margin-top:10px;color:var(--muted)">Don't have an account? <a href="#" id="showSignup" style="color:var(--light-gold)">Create one</a></p>
+      </div>
 
-	  <!-- SIGNUP -->
-	  <div id="signupDiv" class="auth-card">
-		<h2 style="color:var(--gold)">Sign Up</h2>
-		<form id="signupForm" class="auth-form">
-		  <input id="signupEmail" type="email" placeholder="Email" required />
-		  <input id="signupPassword" type="password" placeholder="Password" required />
-		  <button type="submit">Create Account</button>
-		</form>
-		<p class="auth-toggle">
-		  Already have an account? <a href="#" id="showLogin">Back to Login</a>
-		</p>
-	  </div>
-	</div>
+      <!-- signup -->
+      <div id="signupDiv" class="auth-card">
+        <h2 style="color:var(--gold)">Sign Up</h2>
+        <form id="signupForm" class="auth-form">
+          <input id="signupEmail" type="email" placeholder="Email" required />
+          <input id="signupPassword" type="password" placeholder="Password" required />
+          <button type="submit">Create Account</button>
+        </form>
+        <p style="margin-top:10px;color:var(--muted)">Already have an account? <a href="#" id="showLogin" style="color:var(--light-gold)">Back to Login</a></p>
+      </div>
 
+      <!-- reset -->
+      <div id="resetDiv" class="auth-card">
+        <h2 style="color:var(--gold)">Reset Password</h2>
+        <form id="resetForm" class="auth-form">
+          <input id="resetEmail" type="email" placeholder="Your registered email" required />
+          <button type="submit">Send Reset Link</button>
+        </form>
+        <p style="margin-top:10px;color:var(--muted)">Remembered? <a href="#" id="backToLogin" style="color:var(--light-gold)">Back to Login</a></p>
+      </div>
+    </div>
 
-    <!-- App -->
+    <!-- APP -->
     <div id="appDiv" style="display:none;">
+      <!-- summary cards -->
       <div class="summary">
-        <div class="card">
-          <div class="label">Total Gold</div>
-          <div class="value"><span id="totalGold">0</span> g</div>
-        </div>
+        <div class="card"><div class="label">Total Gold</div><div class="value"><span id="totalGold">0</span> g</div></div>
+        <div class="card"><div class="label">Total Cost</div><div class="value"><span id="totalCost">₹0.00</span></div></div>
+        <div class="card"><div class="label">Current Value</div><div class="value"><span id="currentValue">₹0.00</span></div></div>
+        <div class="card"><div class="label">Unrealized Profit / Loss</div><div class="value"><div id="profitValue" style="font-size:1.2rem;font-weight:700">₹0.00</div><div id="profitPercentText" style="margin-top:6px;font-size:0.9rem;color:#bbb">—</div></div></div>
 
-        <div class="card">
-          <div class="label">Buy Price</div>
-          <div class="value"><span id="totalCost">₹0.00</span></div>
-        </div>
-
-        <div class="card">
-          <div class="label">Current Price</div>
-          <div class="value"><span id="currentValue">₹0.00</span></div>
-        </div>
-
-        <div class="card" id="profitCard">
-          <div class="label">Portfolio Value</div>
-          <div class="value">
-            <div id="profitValue" style="font-size:1.3rem;font-weight:700;">₹0.00</div>
-            <div id="profitPercentText" style="font-size:0.85rem;color:#bbb;margin-top:4px;">—</div>
-          </div>
-        </div>
-
-        <!-- Goal Tracker -->
+        <!-- goal card -->
         <div class="card">
           <div class="label">Your Gold Goal</div>
-          <div class="goal">
-            <div class="goal-row">
-              <div>
-                <div id="goalSummary" style="color:var(--light-gold);font-weight:700">No goal set</div>
-                <div id="goalSub" style="font-size:13px;color:#aaa">Set a target (grams & date)</div>
-              </div>
+          <div style="color:var(--light-gold);font-weight:700;margin-top:6px" id="goalSummary">No goal set</div>
+          <div class="goal-progress-wrap" style="margin-top:10px">
+            <div class="progress-bar">
+              <span class="progress-fill" id="progressFill"><span class="progress-glow"></span></span>
             </div>
-
-            <div class="goal-progress-wrap">
-              <div class="progress-bar">
-                <span class="progress-fill" id="progressFill">
-                  <span class="progress-glow"></span>
-                </span>
-              </div>
-              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:#bbb">
-                <span id="goalProgressText">0%</span>
-                <span id="goalETA"></span>
-              </div>
-            </div>
-
-            <div class="goal-row">
-              <input id="targetGrams" type="number" step="0.001" placeholder="Target grams" style="width:150px" />
-              <input id="targetDate" type="date" style="width:160px" />
-              <button id="saveGoal">Save Goal</button>
-            </div>
-
-            <div class="goal-row" style="font-size:13px;color:#bbb">
-              <div id="goalSuggestion">—</div>
-            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:#bbb"><span id="goalProgressText">0%</span><span id="goalETA"></span></div>
           </div>
+          <div style="margin-top:10px;display:flex;gap:8px;justify-content:center">
+            <input id="targetGrams" type="number" step="0.001" placeholder="Target grams" style="width:140px;padding:8px;border-radius:8px;background:#000;border:1px solid var(--dark-gold);color:var(--light-gold);text-align:center"/>
+            <input id="targetDate" type="date" style="width:160px;padding:8px;border-radius:8px;background:#000;border:1px solid var(--dark-gold);color:var(--light-gold);text-align:center"/>
+            <button id="saveGoal" style="padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--gold),var(--dark-gold));color:#000;font-weight:700;cursor:pointer">Save</button>
+          </div>
+          <div style="margin-top:10px;color:#bbb;font-size:13px" id="goalSuggestion">—</div>
         </div>
 
+        <!-- price card -->
         <div class="card">
           <div class="label">Today's Gold Price</div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap">
-            <input id="priceDate" type="date" required />
-            <input id="priceValue" type="number" step="0.01" placeholder="Price ₹" required />
-            <button id="savePrice">Save</button>
+          <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:6px">
+            <input id="priceDate" type="date" style="padding:8px;border-radius:8px;background:#000;border:1px solid var(--dark-gold);color:var(--light-gold)"/>
+            <input id="priceValue" type="number" step="0.01" placeholder="Price ₹" style="padding:8px;border-radius:8px;background:#000;border:1px solid var(--dark-gold);color:var(--light-gold)"/>
+            <button id="savePrice" style="padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--gold),var(--dark-gold));color:#000;font-weight:700;cursor:pointer">Save</button>
           </div>
-          <small id="lastUpdated" style="color:#aaa"></small>
+          <small id="lastUpdated" style="color:#aaa;display:block;margin-top:8px"></small>
         </div>
       </div>
 
+      <!-- chart -->
       <div class="chart-block">
-        <div class="chart-controls">
-          <strong>Filter chart:</strong>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+          <strong style="color:var(--muted)">Filter chart:</strong>
           <div id="filterWeek" class="pill">Week</div>
           <div id="filterMonth" class="pill active">Month</div>
           <div id="filterYear" class="pill">Year</div>
@@ -288,6 +231,7 @@ tr:hover{background:rgba(212,175,55,0.06)}
         </div>
       </div>
 
+      <!-- add purchase -->
       <form id="addForm">
         <input id="purchaseDate" type="date" required />
         <input id="amount" type="text" placeholder="Amount ₹" required />
@@ -295,10 +239,9 @@ tr:hover{background:rgba(212,175,55,0.06)}
         <button type="submit">Add Purchase</button>
       </form>
 
+      <!-- table -->
       <table>
-        <thead>
-          <tr><th>Date</th><th>Amount</th><th>Gold</th><th>Action</th></tr>
-        </thead>
+        <thead><tr><th>Date</th><th>Amount</th><th>Gold</th><th>Action</th></tr></thead>
         <tbody id="purchaseTable"></tbody>
       </table>
     </div>
@@ -308,314 +251,407 @@ tr:hover{background:rgba(212,175,55,0.06)}
   <div class="toaster" id="toaster"></div>
 
 <script type="module">
+/* Full JS (uses Supabase) */
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const supabase = createClient(
-  'https://febpaanqrqgrnbyrvfxx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYnBhYW5xcnFncm5ieXJ2Znh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDUzNzMsImV4cCI6MjA3NjUyMTM3M30.dFyrWiNKqGCVDGLN9HU2IyRuI6rqAJaZGwRQjXri3mQ'
-)
+/* -------------------------
+   Supabase init (your keys)
+   ------------------------- */
+const SUPABASE_URL = 'https://febpaanqrqgrnbyrvfxx.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYnBhYW5xcnFncm5ieXJ2Znh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NDUzNzMsImV4cCI6MjA3NjUyMTM3M30.dFyrWiNKqGCVDGLN9HU2IyRuI6rqAJaZGwRQjXri3mQ'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-/* ---------- UTILITIES ---------- */
-const formatCurrency = n => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR' }).format(n || 0)
-const unformatCurrency = s => parseFloat(s.replace(/[₹,\s]/g,'')) || 0
+/* ---------- DOM refs ---------- */
+const userInfoBtn = document.getElementById('userInfoBtn')
+const profileDropdown = document.getElementById('profileDropdown')
+const dropdownEmail = document.getElementById('dropdownEmail')
+const dropdownLogout = document.getElementById('dropdownLogout')
+
+const authContainer = document.getElementById('authContainer')
+const loginDiv = document.getElementById('loginDiv')
+const signupDiv = document.getElementById('signupDiv')
+const resetDiv = document.getElementById('resetDiv')
+const loginForm = document.getElementById('loginForm')
+const signupForm = document.getElementById('signupForm')
+const resetForm = document.getElementById('resetForm')
+const forgotPassword = document.getElementById('forgotPassword')
+const showSignup = document.getElementById('showSignup')
+const showLogin = document.getElementById('showLogin')
+const backToLogin = document.getElementById('backToLogin')
+
+const appDiv = document.getElementById('appDiv')
+const purchaseTable = document.getElementById('purchaseTable')
+const totalGoldEl = document.getElementById('totalGold')
+const totalCostEl = document.getElementById('totalCost')
+const currentValueEl = document.getElementById('currentValue')
+const priceDateInput = document.getElementById('priceDate')
+const priceValueInput = document.getElementById('priceValue')
+const savePriceBtn = document.getElementById('savePrice')
+const lastUpdated = document.getElementById('lastUpdated')
+const filterWeek = document.getElementById('filterWeek')
+const filterMonth = document.getElementById('filterMonth')
+const filterYear = document.getElementById('filterYear')
+const addForm = document.getElementById('addForm')
+const purchaseDateInput = document.getElementById('purchaseDate')
+const amountInput = document.getElementById('amount')
+const goldInput = document.getElementById('gold')
+
+const targetGramsInput = document.getElementById('targetGrams')
+const targetDateInput = document.getElementById('targetDate')
+const saveGoalBtn = document.getElementById('saveGoal')
+const goalSummary = document.getElementById('goalSummary')
+const progressFill = document.getElementById('progressFill')
+const goalProgressText = document.getElementById('goalProgressText')
+const goalSuggestion = document.getElementById('goalSuggestion')
+
+const toaster = document.getElementById('toaster')
+const confettiWrap = document.getElementById('confettiWrap')
+let goldChart = null
+
+/* ---------- utils ---------- */
+function showToast(message, type='success', timeout=3500){
+  const el = document.createElement('div')
+  el.className = 'toast' + (type === 'error' ? ' error' : '')
+  el.innerText = message
+  toaster.appendChild(el)
+  setTimeout(()=>{ el.style.transition='opacity .35s, transform .35s'; el.style.opacity='0'; el.style.transform='translateY(-10px)'; setTimeout(()=>el.remove(),420) }, timeout)
+}
+const formatCurrency = n => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 }).format(n || 0)
+const unformatCurrency = s => typeof s === 'string' ? parseFloat(s.replace(/[₹,\s]/g,'')) || 0 : Number(s) || 0
 const formatDateISO = d => new Date(d).toISOString().split('T')[0]
-function showToast(msg, type='success', timeout=3500){
-  const t=document.createElement('div')
-  t.className='toast'+(type==='error'?' error':'')
-  t.innerText=msg
-  toaster.appendChild(t)
-  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-10px)';setTimeout(()=>t.remove(),400)},timeout)
+function prettyDate(d){
+  try {
+    const dt = new Date(d)
+    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+  } catch(e){ return d }
 }
 
-/* ---------- DOM REFS ---------- */
-const loginDiv=document.getElementById('loginDiv')
-const appDiv=document.getElementById('appDiv')
-const loginForm=document.getElementById('loginForm')
-const signupLink=document.getElementById('signupLink')
-const logoutBtn=document.getElementById('logout')
-const userInfo=document.getElementById('userInfo')
-const purchaseDateInput=document.getElementById('purchaseDate')
-const amountInput=document.getElementById('amount')
-const goldInput=document.getElementById('gold')
-const purchaseTable=document.getElementById('purchaseTable')
-const totalGoldEl=document.getElementById('totalGold')
-const totalCostEl=document.getElementById('totalCost')
-const currentValueEl=document.getElementById('currentValue')
-const priceDate=document.getElementById('priceDate')
-const priceValue=document.getElementById('priceValue')
-const savePrice=document.getElementById('savePrice')
-const lastUpdated=document.getElementById('lastUpdated')
-const targetGramsInput=document.getElementById('targetGrams')
-const targetDateInput=document.getElementById('targetDate')
-const saveGoalBtn=document.getElementById('saveGoal')
-const progressFill=document.getElementById('progressFill')
-const goalProgressText=document.getElementById('goalProgressText')
-const goalSuggestion=document.getElementById('goalSuggestion')
-const confettiWrap=document.getElementById('confettiWrap')
-const toaster=document.getElementById('toaster')
-const filterWeek=document.getElementById('filterWeek')
-const filterMonth=document.getElementById('filterMonth')
-const filterYear=document.getElementById('filterYear')
+/* ---------- small UI helpers ---------- */
+function showCard(cardEl){ [loginDiv, signupDiv, resetDiv].forEach(c => c.classList.remove('active')); cardEl.classList.add('active') }
+showSignup.addEventListener('click', e=>{ e.preventDefault(); showCard(signupDiv) })
+showLogin.addEventListener('click', e=>{ e.preventDefault(); showCard(loginDiv) })
+forgotPassword.addEventListener('click', e=>{ e.preventDefault(); showCard(resetDiv) })
+backToLogin.addEventListener('click', e=>{ e.preventDefault(); showCard(loginDiv) })
 
-let goldChart=null,chartFilter='month',currentUser=null,currentGoal=null,goalCelebrationFired=false
+/* ---------- AUTH flows ---------- */
+let currentUser = null
 
-/* ---------- AUTH ---------- */
 async function checkUser(){
   const { data } = await supabase.auth.getSession()
-  if(data?.session){currentUser=data.session.user;showApp(currentUser)}
+  if (data?.session) {
+    currentUser = data.session.user
+    showApp(currentUser)
+  } else {
+    // show auth UI
+    authContainer.style.display = 'block'
+    appDiv.style.display = 'none'
+    userInfoBtn.style.display = 'none'
+  }
 }
 checkUser()
 
-loginForm.addEventListener('submit',async e=>{
-  e.preventDefault()
-  const email=document.getElementById('loginEmail').value
-  const pw=document.getElementById('loginPassword').value
-  const { data,error }=await supabase.auth.signInWithPassword({email,password:pw})
-  if(error) return showToast(error.message,'error')
-  currentUser=data.user
-  showToast('Login successful')
-  showApp(currentUser)
-})
-// 🔹 Toggle between Login and Signup
-const loginCard = document.getElementById('loginDiv')
-const signupCard = document.getElementById('signupDiv')
-document.getElementById('showSignup').addEventListener('click', e => {
-  e.preventDefault()
-  loginCard.classList.remove('active')
-  signupCard.classList.add('active')
-})
-document.getElementById('showLogin').addEventListener('click', e => {
-  e.preventDefault()
-  signupCard.classList.remove('active')
-  loginCard.classList.add('active')
-})
-
-// 🔹 Handle Sign Up
-const signupForm = document.getElementById('signupForm')
-signupForm.addEventListener('submit', async e => {
-  e.preventDefault()
+// Signup
+signupForm.addEventListener('submit', async (ev) => {
+  ev.preventDefault()
   const email = document.getElementById('signupEmail').value
   const password = document.getElementById('signupPassword').value
   const { error } = await supabase.auth.signUp({ email, password })
-  if (error) return showToast(error.message, 'error')
-  showToast('Account created! Please login ✨')
-  signupCard.classList.remove('active')
-  loginCard.classList.add('active')
+  if (error) { showToast(error.message, 'error'); return }
+  showToast('Account created — check your email to confirm (if required).')
+  showCard(loginDiv)
 })
 
-// 🔹 Handle Login
-loginForm.addEventListener('submit', async e => {
-  e.preventDefault()
+// Login
+loginForm.addEventListener('submit', async (ev) => {
+  ev.preventDefault()
   const email = document.getElementById('loginEmail').value
-  const pw = document.getElementById('loginPassword').value
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw })
-  if (error) return showToast(error.message, 'error')
+  const password = document.getElementById('loginPassword').value
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) { showToast(error.message, 'error'); return }
   currentUser = data.user
-  showToast('Login successful!')
+  showToast('Login successful')
   showApp(currentUser)
 })
 
-logoutBtn.addEventListener('click',async()=>{await supabase.auth.signOut();location.reload()})
+// Reset request
+resetForm.addEventListener('submit', async (ev) => {
+  ev.preventDefault()
+  const email = document.getElementById('resetEmail').value
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin })
+  if (error) { showToast(error.message, 'error'); return }
+  showToast('Reset link sent — check your inbox.')
+  resetForm.reset()
+  showCard(loginDiv)
+})
 
-/* ---------- APP ---------- */
+/* ---------- DROPDOWN (Logout only) ---------- */
+function setupDropdown(){
+  userInfoBtn.style.display = 'none'
+  profileDropdown.classList.remove('active')
+
+  userInfoBtn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    profileDropdown.classList.toggle('active')
+  })
+  document.addEventListener('click', (e) => {
+    if (!profileDropdown.contains(e.target) && e.target !== userInfoBtn) profileDropdown.classList.remove('active')
+  })
+  dropdownLogout.addEventListener('click', async (e) => {
+    e.preventDefault()
+    profileDropdown.classList.remove('active')
+    await supabase.auth.signOut()
+    location.reload()
+  })
+}
+setupDropdown()
+
+/* ---------- showApp & initial loads ---------- */
 function showApp(user){
-  loginDiv.style.display='none'
-  appDiv.style.display='block'
-  logoutBtn.style.display='inline-block'
-  userInfo.textContent=user.email
-  loadPurchases()
-  loadGoldPrice(chartFilter)
-  loadUserGoal()
+  currentUser = user
+  authContainer.style.display = 'none'
+  appDiv.style.display = 'block'
+  userInfoBtn.style.display = 'inline-block'
+  const displayEmail = user.email || (user.user && user.user.email) || ''
+  userInfoBtn.textContent = displayEmail + ' ▾'
+  dropdownEmail.textContent = displayEmail
+  // set default dates and formatting
+  setTodayInputs()
+  // load data
+  setTimeout(()=>{ loadPurchases(); loadGoldPrice(chartFilter); loadUserGoal() }, 60)
 }
 
-/* ---------- PURCHASES ---------- */
+/* ---------- Purchases CRUD ---------- */
 async function loadPurchases(){
-  const {data,error}=await supabase.from('gold_purchases').select('*').order('purchase_date',{ascending:true})
-  if(error)return showToast(error.message,'error')
-  purchaseTable.innerHTML=''
-  data.forEach(p=>{
-    const tr=document.createElement('tr')
-    tr.innerHTML=`<td>${p.purchase_date}</td><td>${formatCurrency(p.amount)}</td><td>${p.gold} g</td><td><button class='delete-btn' onclick='deletePurchase(${p.id})'>Delete</button></td>`
+  const { data, error } = await supabase.from('gold_purchases').select('*').order('purchase_date', { ascending: true })
+  if (error) { showToast(error.message, 'error'); return }
+  purchaseTable.innerHTML = ''
+  data.forEach(p => {
+    const tr = document.createElement('tr')
+    tr.innerHTML = `<td>${prettyDate(p.purchase_date)}</td>
+                    <td>${formatCurrency(p.amount)}</td>
+                    <td>${Number(p.gold).toFixed(3)} g</td>
+                    <td><button class="action-btn delete-btn" onclick="deletePurchase(${p.id})">Delete</button></td>`
     purchaseTable.appendChild(tr)
   })
   calculateSummary()
 }
-window.deletePurchase=async id=>{
-  const {error}=await supabase.from('gold_purchases').delete().eq('id',id)
-  if(error)return showToast(error.message,'error')
-  showToast('Deleted')
-  loadPurchases();loadUserGoal()
+window.deletePurchase = async function(id){
+  const { error } = await supabase.from('gold_purchases').delete().eq('id', id)
+  if (error) { showToast(error.message, 'error'); return }
+  showToast('Purchase deleted')
+  await loadPurchases()
+  await loadUserGoal()
 }
 
-/* Add purchase */
-addForm.addEventListener('submit',async e=>{
-  e.preventDefault()
-  const purchase_date=purchaseDateInput.value
-  const amount=unformatCurrency(amountInput.value)
-  const gold=parseFloat(goldInput.value)
-  const {data:userData}=await supabase.auth.getUser()
-  const user_id=userData?.user?.id||null
-  const {error}=await supabase.from('gold_purchases').insert([{purchase_date,amount,gold,user_id}])
-  if(error)return showToast(error.message,'error')
+addForm.addEventListener('submit', async (ev) => {
+  ev.preventDefault()
+  const purchase_date = purchaseDateInput.value || formatDateISO(new Date())
+  const amount = unformatCurrency(amountInput.value)
+  const gold = parseFloat(goldInput.value)
+  if (!purchase_date || !amount || isNaN(gold) || gold <= 0) return showToast('Enter valid purchase data', 'error')
+  const { data: userData } = await supabase.auth.getUser()
+  const user_id = userData?.user?.id || null
+  const { error } = await supabase.from('gold_purchases').insert([{ purchase_date, amount, gold, user_id }])
+  if (error) { showToast(error.message, 'error'); return }
   showToast('Purchase added')
-  addForm.reset();loadPurchases();loadUserGoal()
+  addForm.reset()
+  loadPurchases()
+  loadUserGoal()
 })
 
-/* ---------- GOLD PRICE ---------- */
-function computeStartDate(f){const t=new Date(),s=new Date(t);if(f==='week')s.setDate(t.getDate()-6);else if(f==='month')s.setDate(t.getDate()-29);else s.setDate(t.getDate()-364);return formatDateISO(s)}
-async function loadGoldPrice(f='month'){
-  const s=computeStartDate(f)
-  const {data,error}=await supabase.from('gold_price').select('*').gte('price_date',s).order('price_date',{ascending:true})
-  if(error)return showToast(error.message,'error')
-  drawGoldChart(data)
-  if(data?.length){
-    const l=data[data.length-1]
-    priceValue.value=l.price
-    priceDate.value=l.price_date
-    lastUpdated.textContent=`Last updated: ${l.price_date}`
-  }
+/* ---------- Gold price chart & management ---------- */
+let chartFilter = 'month'
+function computeStartDate(filter){
+  const today = new Date()
+  const start = new Date(today)
+  if (filter === 'week') start.setDate(today.getDate() - 6)
+  else if (filter === 'month') start.setDate(today.getDate() - 29)
+  else start.setDate(today.getDate() - 364)
+  return formatDateISO(start)
+}
+async function loadGoldPrice(filter = 'month'){
+  chartFilter = filter
+  const startDate = computeStartDate(filter)
+  const { data, error } = await supabase.from('gold_price').select('*').gte('price_date', startDate).order('price_date', { ascending: true })
+  if (error) { showToast(error.message, 'error'); return }
+  drawGoldChart(data || [])
+  if (data && data.length) {
+    const latest = data[data.length - 1]
+    priceValueInput.value = latest.price
+    priceDateInput.value = latest.price_date
+    lastUpdated.textContent = `Last updated: ${latest.price_date}`
+  } else lastUpdated.textContent = ''
   calculateSummary()
 }
-function drawGoldChart(data){
-  const ctx=document.getElementById('goldChart').getContext('2d')
-  const labels=data.map(d=>d.price_date),prices=data.map(d=>d.price)
-  if(goldChart)goldChart.destroy()
-  goldChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{data:prices,borderColor:'#d4af37',backgroundColor:'rgba(212,175,55,0.08)',fill:true,tension:.2}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#ccc'}},y:{ticks:{color:'#ccc'}}}}})
-}
-filterWeek.onclick=()=>{chartFilter='week';filterWeek.classList.add('active');filterMonth.classList.remove('active');filterYear.classList.remove('active');loadGoldPrice('week')}
-filterMonth.onclick=()=>{chartFilter='month';filterMonth.classList.add('active');filterWeek.classList.remove('active');filterYear.classList.remove('active');loadGoldPrice('month')}
-filterYear.onclick=()=>{chartFilter='year';filterYear.classList.add('active');filterWeek.classList.remove('active');filterMonth.classList.remove('active');loadGoldPrice('year')}
-savePrice.onclick=async()=>{
-  const p=parseFloat(priceValue.value),d=priceDate.value
-  if(!p)return showToast('Invalid price','error')
-  const {error}=await supabase.from('gold_price').upsert([{price_date:d,price:p}],{onConflict:['price_date']})
-  if(error)return showToast(error.message,'error')
-  showToast('Price saved');loadGoldPrice(chartFilter)
-}
-
-/* ---------- SUMMARY ---------- */
-function calculateSummary(){
-  let totalGold=0,totalCost=0
-  purchaseTable.querySelectorAll('tr').forEach(tr=>{
-    const tds=tr.querySelectorAll('td')
-    totalGold+=parseFloat(tds[2].innerText)||0
-    totalCost+=unformatCurrency(tds[1].innerText)
+function drawGoldChart(rows){
+  const ctx = document.getElementById('goldChart').getContext('2d')
+  const labels = (rows || []).map(r => r.price_date)
+  const prices = (rows || []).map(r => r.price)
+  if (goldChart) goldChart.destroy()
+  goldChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ label: 'Gold (₹/g)', data: prices, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.08)', fill:true, tension:0.18, pointRadius:4, pointBackgroundColor:'#f6e27a' }] },
+    options: {
+      responsive:true, maintainAspectRatio: false,
+      plugins:{legend:{display:false}},
+      scales:{ x:{ ticks:{ color:'#ccc', autoSkip: true, maxRotation:45 }, grid:{ color:'#222' } }, y:{ ticks:{ color:'#ccc', callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid:{ color:'#222' } }
+      }
+    }
   })
-  totalGoldEl.innerText=totalGold.toFixed(3)
-  totalCostEl.innerText=formatCurrency(totalCost)
+  // size adjustment: keep container height fixed via CSS; Chart will fill it.
+  goldChart.resize()
+}
+filterWeek.addEventListener('click', ()=>{ filterWeek.classList.add('active'); filterMonth.classList.remove('active'); filterYear.classList.remove('active'); loadGoldPrice('week') })
+filterMonth.addEventListener('click', ()=>{ filterMonth.classList.add('active'); filterWeek.classList.remove('active'); filterYear.classList.remove('active'); loadGoldPrice('month') })
+filterYear.addEventListener('click', ()=>{ filterYear.classList.add('active'); filterWeek.classList.remove('active'); filterMonth.classList.remove('active'); loadGoldPrice('year') })
 
-  const price=parseFloat(priceValue.value)
-  const profitValueEl=document.getElementById('profitValue')
-  const profitPercentText=document.getElementById('profitPercentText')
+savePriceBtn.addEventListener('click', async ()=>{
+  const price = parseFloat(priceValueInput.value)
+  const date = priceDateInput.value || formatDateISO(new Date())
+  if (!price || price <= 0) { showToast('Enter valid gold price', 'error'); return }
+  const { error } = await supabase.from('gold_price').upsert([{ price_date: date, price }], { onConflict: ['price_date'] })
+  if (error) { showToast('Error saving price: ' + error.message, 'error'); return }
+  showToast('Gold price saved')
+  await loadGoldPrice(chartFilter)
+})
 
-  if(!price||price<=0||totalGold<=0||totalCost<=0){
-    profitValueEl.innerText="₹0.00"
-    profitPercentText.innerText="—"
-    profitValueEl.style.color="#ccc"
-    currentValueEl.innerText=formatCurrency(totalCost)
+/* ---------- Summary & profit ---------- */
+function calculateSummary(){
+  let totalGold = 0, totalCost = 0
+  purchaseTable.querySelectorAll('tr').forEach(tr => {
+    const tds = tr.querySelectorAll('td')
+    totalGold += parseFloat(tds[2].innerText) || 0
+    totalCost += unformatCurrency(tds[1].innerText)
+  })
+  totalGoldEl.innerText = totalGold.toFixed(3)
+  totalCostEl.innerText = formatCurrency(totalCost)
+
+  const price = parseFloat(priceValueInput.value)
+  const profitValueEl = document.getElementById('profitValue')
+  const profitPercentText = document.getElementById('profitPercentText')
+
+  if (!price || price <= 0 || totalGold <= 0 || totalCost <= 0) {
+    profitValueEl.innerText = "₹0.00"
+    profitPercentText.innerText = "—"
+    profitValueEl.style.color = "#ccc"
+    currentValueEl.innerText = formatCurrency(totalCost)
     return
   }
 
-  const currentValue=totalGold*price
-  const profit=currentValue-totalCost
-  const percent=(profit/totalCost)*100
-  const isGain=profit>=0
-  profitValueEl.style.color=isGain?"lightgreen":"#ff6666"
-  const sign=isGain?"+":"–"
-  const word=isGain?"gain":"drop"
+  const currentValue = totalGold * price
+  const profit = currentValue - totalCost
+  const percent = totalCost > 0 ? (profit / totalCost) * 100 : 0
+  const isGain = profit >= 0
+  profitValueEl.style.color = isGain ? "lightgreen" : "#ff6666"
+  const sign = isGain ? "+" : "–"
+  const word = isGain ? "gain" : "drop"
 
-  profitValueEl.innerText=formatCurrency(profit)
-  profitPercentText.innerHTML=`${sign}${Math.abs(percent).toFixed(2)} % <span style="color:#aaa;">${word}</span>`
-  currentValueEl.innerText=formatCurrency(currentValue)
+  profitValueEl.innerText = formatCurrency(profit)
+  profitPercentText.innerHTML = `${sign}${Math.abs(percent).toFixed(2)} % <span style="color:#aaa">${word}</span>`
+  currentValueEl.innerText = formatCurrency(currentValue)
 }
 
-/* ---------- GOAL TRACKER ---------- */
+/* ---------- Goal tracker ---------- */
 async function loadUserGoal(){
-  if(!currentUser)return
-  const {data,error}=await supabase.from('user_goals').select('*').eq('user_id',currentUser.id).limit(1)
-  if(error)return
-  currentGoal=data[0]||null
-  if(currentGoal){
-    targetGramsInput.value=currentGoal.target_grams
-    targetDateInput.value=currentGoal.target_date
-    // Format date as dd-MMM-yyyy (e.g., 10-Mar-2026)
-	const goalDate = new Date(currentGoal.target_date)
-	const formattedDate = goalDate.toLocaleDateString('en-GB', {
-	  day: '2-digit',
-	  month: 'short',
-	  year: 'numeric'
-	}).replace(/ /g, '-')
-
-	document.getElementById('goalSummary').innerText = 
-	  `Target ${currentGoal.target_grams}g by ${formattedDate}`
-
+  if (!currentUser) return
+  const { data, error } = await supabase.from('user_goals').select('*').eq('user_id', currentUser.id).limit(1)
+  if (error) return
+  const goal = data?.[0] || null
+  if (goal) {
+    targetGramsInput.value = goal.target_grams
+    targetDateInput.value = goal.target_date
+    const gd = new Date(goal.target_date)
+    const formatted = gd.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+    goalSummary.innerText = `Target ${goal.target_grams}g by ${formatted}`
+    window._currentGoal = goal
   } else {
-    document.getElementById('goalSummary').innerText='No goal set'
+    goalSummary.innerText = 'No goal set'
+    window._currentGoal = null
   }
   updateGoalProgress()
 }
-async function saveGoal(){
-  if(!currentUser)return showToast('Not signed in','error')
-  const tg=parseFloat(targetGramsInput.value),td=targetDateInput.value
-  if(!tg||!td)return showToast('Invalid goal','error')
-  const {data}=await supabase.from('user_goals').select('*').eq('user_id',currentUser.id).limit(1)
-  if(data?.length){
-    await supabase.from('user_goals').update({target_grams:tg,target_date:td}).eq('id',data[0].id)
+saveGoalBtn.addEventListener('click', async ()=>{
+  if (!currentUser) return showToast('Not signed in', 'error')
+  const tg = parseFloat(targetGramsInput.value)
+  const td = targetDateInput.value
+  if (!tg || !td) return showToast('Invalid goal', 'error')
+  const { data } = await supabase.from('user_goals').select('*').eq('user_id', currentUser.id).limit(1)
+  if (data?.length) {
+    const id = data[0].id
+    const { error } = await supabase.from('user_goals').update({ target_grams: tg, target_date: td }).eq('id', id)
+    if (error) return showToast(error.message, 'error')
     showToast('Goal updated')
   } else {
-    await supabase.from('user_goals').insert([{user_id:currentUser.id,target_grams:tg,target_date:td}])
+    const { error } = await supabase.from('user_goals').insert([{ user_id: currentUser.id, target_grams: tg, target_date: td }])
+    if (error) return showToast(error.message, 'error')
     showToast('Goal saved')
   }
-  loadUserGoal()
-}
-saveGoalBtn.addEventListener('click',()=>saveGoal())
+  await loadUserGoal()
+})
 
 function updateGoalProgress(){
-  if(!currentGoal){
-    progressFill.style.width='0%'
-    goalProgressText.innerText='0%'
-    goalSuggestion.innerText='No goal set'
+  const currentGoal = window._currentGoal
+  if (!currentGoal) {
+    progressFill.style.width = '0%'
+    goalProgressText.innerText = '0%'
+    goalSuggestion.innerText = 'No goal set'
     return
   }
-  let totalGold=0
-  purchaseTable.querySelectorAll('tr').forEach(tr=>{totalGold+=parseFloat(tr.children[2].innerText)||0})
-  const pct=Math.min(100,(totalGold/currentGoal.target_grams)*100)
-  progressFill.style.width=pct+'%'
-  goalProgressText.innerText=`${pct.toFixed(1)}% (${totalGold.toFixed(2)} / ${currentGoal.target_grams}g)`
-  const rem=Math.max(0,currentGoal.target_grams-totalGold)
-  const days=(new Date(currentGoal.target_date)-new Date())/86400000
-  if(rem<=0){
-    goalSuggestion.innerText='Goal achieved 🎉'
+  let totalGold = 0
+  purchaseTable.querySelectorAll('tr').forEach(tr => { totalGold += parseFloat(tr.children[2].innerText) || 0 })
+  const pct = Math.min(100, (totalGold / currentGoal.target_grams) * 100)
+  progressFill.style.width = pct + '%'
+  goalProgressText.innerText = `${pct.toFixed(1)}% (${totalGold.toFixed(2)} / ${currentGoal.target_grams}g)`
+  const rem = Math.max(0, currentGoal.target_grams - totalGold)
+  const days = (new Date(currentGoal.target_date) - new Date()) / 86400000
+  if (rem <= 0) {
+    goalSuggestion.innerText = 'Goal achieved 🎉'
     triggerGoalAchieved()
-  } else if(days<=0){
-    goalSuggestion.innerText=`Target date passed; ${rem.toFixed(2)}g left.`
+  } else if (days <= 0) {
+    goalSuggestion.innerText = `Target date passed; ${rem.toFixed(2)}g left.`
   } else {
-    const gpm=rem/Math.max(1,days/30),gpw=rem/Math.max(1,days/7)
-    goalSuggestion.innerText=`Invest ~${gpm.toFixed(2)}g/month or ${gpw.toFixed(2)}g/week`
+    const gpm = rem / Math.max(1, days / 30)
+    const gpw = rem / Math.max(1, days / 7)
+    goalSuggestion.innerText = `Invest ~${gpm.toFixed(2)}g/month or ${gpw.toFixed(2)}g/week`
   }
 }
 
+let _celebrated = false
 function triggerGoalAchieved(){
-  if(goalCelebrationFired)return
-  goalCelebrationFired=true
+  if (_celebrated) return
+  _celebrated = true
   showToast('🎉 Goal Achieved!')
-  const colors=['#d4af37','#f6e27a','#ffd966','#b08d2a']
-  for(let i=0;i<70;i++){
-    const e=document.createElement('div')
-    e.className='confetti-piece'
-    e.style.background=colors[Math.random()*colors.length|0]
-    e.style.left=Math.random()*100+'%'
-    e.style.top='-10%'
+  const colors = ['#d4af37','#f6e27a','#ffd966','#b08d2a']
+  for (let i=0;i<70;i++){
+    const e = document.createElement('div'); e.className = 'confetti-piece'
+    e.style.background = colors[Math.floor(Math.random()*colors.length)]
+    e.style.left = Math.random()*100 + '%'; e.style.top = '-10%'
     confettiWrap.appendChild(e)
-    const dx=(Math.random()-.5)*200
-    const dur=2000+Math.random()*1600
-    e.animate([{transform:`translate3d(0,0,0) rotate(${Math.random()*360}deg)`},
-               {transform:`translate3d(${dx}px,${innerHeight+100}px,0) rotate(${Math.random()*720}deg)`,opacity:0.3}],
-              {duration:dur,easing:'ease-out'})
-    setTimeout(()=>e.remove(),dur+500)
+    const dx = (Math.random()-0.5)*200, dur = 2000 + Math.random()*1600
+    e.animate([{ transform: `translate3d(0,0,0) rotate(${Math.random()*360}deg)` }, { transform: `translate3d(${dx}px,${innerHeight+100}px,0) rotate(${Math.random()*720}deg)`, opacity: 0.3 }], { duration: dur, easing: 'ease-out' })
+    setTimeout(()=>e.remove(), dur+600)
   }
-  setTimeout(()=>goalCelebrationFired=false,8000)
+  setTimeout(()=>_celebrated=false, 8000)
 }
+
+/* ---------- small helpers & init ---------- */
+function setTodayInputs(){
+  if (purchaseDateInput) purchaseDateInput.value = formatDateISO(new Date())
+  if (priceDateInput) priceDateInput.value = formatDateISO(new Date())
+}
+setTodayInputs()
+
+/* Detect password recovery link (optional UX) */
+(function detectRecoveryFlow(){
+  const hash = window.location.hash || ''
+  if (hash.includes('type=recovery') || hash.includes('access_token')) {
+    showToast('Open the app via the link to complete password reset (follow Supabase flow).', 'success', 4500)
+  }
+})()
+
+/* initial check (runs earlier too) */
+checkUser()
+
 </script>
 </body>
 </html>
