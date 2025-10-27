@@ -160,15 +160,9 @@ tr:hover{background:rgba(212,175,55,0.06)}
       <div class="summary">
         <div class="card"><div class="label">Total Gold</div><div class="value"><span id="totalGold">0</span> g</div></div>
         <div class="card"><div class="label">Total Cost</div><div class="value"><span id="totalCost">₹0.00</span></div></div>
-        <div class="card">
-          <div class="label">Gold Price Manager</div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap">
-            <input id="priceDate" type="date" required />
-            <input id="priceValue" type="number" step="0.01" placeholder="Price ₹" required />
-            <button id="savePrice">Save</button>
-          </div>
-          <small id="lastUpdated" style="color:#aaa"></small>
-        </div>
+        <div class="card"><div class="label">Current Value</div><div class="value"><span id="currentValue">₹0.00</span></div></div>   
+		<div class="card"><div class="label">Profit / Loss</div><div class="value"><span id="profitLoss">₹0.00</span></div></div>
+        <div class="card"><div class="label">Profit %</div><div class="value"><span id="profitLossPercent">0.00</span>%</div></div>  
 
         <!-- Goal Tracker -->
         <div class="card">
@@ -194,10 +188,17 @@ tr:hover{background:rgba(212,175,55,0.06)}
             <div class="goal-row" style="font-size:13px;color:#bbb"><div id="goalSuggestion">—</div></div>
           </div>
         </div>
-
-        <div class="card"><div class="label">Profit / Loss</div><div class="value"><span id="profitLoss">₹0.00</span></div></div>
-        <div class="card"><div class="label">Profit %</div><div class="value"><span id="profitLossPercent">0.00</span>%</div></div>
-        <div class="card"><div class="label">Current Value</div><div class="value"><span id="currentValue">₹0.00</span></div></div>
+		
+		<div class="card">
+          <div class="label">Today's Gold Price</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap">
+            <input id="priceDate" type="date" required />
+            <input id="priceValue" type="number" step="0.01" placeholder="Price ₹" required />
+            <button id="savePrice">Save</button>
+          </div>
+          <small id="lastUpdated" style="color:#aaa"></small>
+        </div>
+		
       </div>
 
       <div class="chart-block">
