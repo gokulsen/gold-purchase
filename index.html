@@ -93,7 +93,7 @@ tr:hover{background:rgba(212,175,55,0.06)}
 
 <body>
   <div class="header-bar">
-    <h1>Gold Purchase Tracker</h1>
+    <h1>🏆 Gold Purchase Tracker</h1>
     <div class="header-actions">
       <span id="userInfo"></span>
       <button id="logout" style="display:none;">Logout</button>
@@ -415,7 +415,17 @@ async function loadUserGoal(){
   if(currentGoal){
     targetGramsInput.value=currentGoal.target_grams
     targetDateInput.value=currentGoal.target_date
-    document.getElementById('goalSummary').innerText=`Target: ${currentGoal.target_grams}g by ${currentGoal.target_date}`
+    // Format date as dd-MMM-yyyy (e.g., 10-Mar-2026)
+	const goalDate = new Date(currentGoal.target_date)
+	const formattedDate = goalDate.toLocaleDateString('en-GB', {
+	  day: '2-digit',
+	  month: 'short',
+	  year: 'numeric'
+	}).replace(/ /g, '-')
+
+	document.getElementById('goalSummary').innerText = 
+	  `Target: ${currentGoal.target_grams}g by ${formattedDate}`
+
   } else {
     document.getElementById('goalSummary').innerText='No goal set'
   }
