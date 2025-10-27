@@ -207,15 +207,15 @@ tr:hover{background:rgba(212,175,55,0.06)}
         </div>
 
         <!-- price card -->
-        <div class="card">
-          <div class="label">Today's Gold Price</div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:6px">
-            <input id="priceDate" type="date" style="padding:8px;border-radius:8px;background:#000;border:1px solid var(--dark-gold);color:var(--light-gold)"/>
-            <input id="priceValue" type="number" step="0.01" placeholder="Price ₹" style="padding:8px;border-radius:8px;background:#000;border:1px solid var(--dark-gold);color:var(--light-gold)"/>
-            <button id="savePrice" style="padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--gold),var(--dark-gold));color:#000;font-weight:700;cursor:pointer">Save</button>
-          </div>
-          <small id="lastUpdated" style="color:#aaa;display:block;margin-top:8px"></small>
-        </div>
+		<div class="card">
+		  <div class="label">Today's Sell Price</div>
+		  <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:6px">
+			<input id="priceDate" type="date" required />
+			<input id="sellPrice" type="number" step="0.01" placeholder="Sell Price ₹" required />
+			<button id="savePrice">Save</button>
+		  </div>
+		  <small id="lastUpdated" style="color:#aaa;display:block;margin-top:8px"></small>
+		</div>
       </div>
 
       <!-- chart -->
@@ -232,16 +232,17 @@ tr:hover{background:rgba(212,175,55,0.06)}
       </div>
 
       <!-- add purchase -->
-      <form id="addForm">
-        <input id="purchaseDate" type="date" required />
-        <input id="amount" type="text" placeholder="Amount ₹" required />
-        <input id="gold" type="number" step="0.001" placeholder="Gold (g)" required />
-        <button type="submit">Add Purchase</button>
-      </form>
+		<form id="addForm">
+		  <input id="purchaseDate" type="date" required />
+		  <input id="buyPrice" type="number" step="0.01" placeholder="Buy Price ₹" required />
+		  <input id="amount" type="text" placeholder="Amount ₹" required />
+		  <input id="gold" type="number" step="0.001" placeholder="Gold (g)" required />
+		  <button type="submit">Add Purchase</button>
+		</form>
 
       <!-- table -->
       <table>
-        <thead><tr><th>Date</th><th>Amount</th><th>Gold</th><th>Action</th></tr></thead>
+        <thead><tr><th>Date</th><th>Amount</th><th>Gold</th><th>Buy Price / g</th><th>Action</th></tr></thead>
         <tbody id="purchaseTable"></tbody>
       </table>
     </div>
@@ -285,7 +286,6 @@ const totalGoldEl = document.getElementById('totalGold')
 const totalCostEl = document.getElementById('totalCost')
 const currentValueEl = document.getElementById('currentValue')
 const priceDateInput = document.getElementById('priceDate')
-const priceValueInput = document.getElementById('priceValue')
 const savePriceBtn = document.getElementById('savePrice')
 const lastUpdated = document.getElementById('lastUpdated')
 const filterWeek = document.getElementById('filterWeek')
@@ -405,21 +405,6 @@ function setupDropdown(){
 }
 setupDropdown()
 
-/* ---------- showApp & initial loads ---------- */
-function showApp(user){
-  currentUser = user
-  authContainer.style.display = 'none'
-  appDiv.style.display = 'block'
-  userInfoBtn.style.display = 'inline-block'
-  const displayEmail = user.email || (user.user && user.user.email) || ''
-  userInfoBtn.textContent = displayEmail + ' ▾'
-  dropdownEmail.textContent = displayEmail
-  // set default dates and formatting
-  setTodayInputs()
-  // load data
-  setTimeout(()=>{ loadPurchases(); loadGoldPrice(chartFilter); loadUserGoal() }, 60)
-}
-
 /* ---------- Purchases CRUD ---------- */
 async function loadPurchases(){
   const { data, error } = await supabase.from('gold_purchases').select('*').order('purchase_date', { ascending: true })
@@ -427,10 +412,12 @@ async function loadPurchases(){
   purchaseTable.innerHTML = ''
   data.forEach(p => {
     const tr = document.createElement('tr')
-    tr.innerHTML = `<td>${prettyDate(p.purchase_date)}</td>
-                    <td>${formatCurrency(p.amount)}</td>
-                    <td>${Number(p.gold).toFixed(3)} g</td>
-                    <td><button class="action-btn delete-btn" onclick="deletePurchase(${p.id})">Delete</button></td>`
+	tr.innerHTML = `
+	  <td>${p.purchase_date}</td>
+	  <td>${formatCurrency(p.amount)}</td>
+	  <td>${p.gold} g</td>
+	  <td data-buy-price="${p.buy_price || 0}">₹${p.buy_price?.toFixed(2) || '0.00'}</td>
+	  <td><button class="action-btn delete-btn" onclick="deletePurchase(${p.id})">Delete</button></td>`
     purchaseTable.appendChild(tr)
   })
   calculateSummary()
@@ -451,7 +438,8 @@ addForm.addEventListener('submit', async (ev) => {
   if (!purchase_date || !amount || isNaN(gold) || gold <= 0) return showToast('Enter valid purchase data', 'error')
   const { data: userData } = await supabase.auth.getUser()
   const user_id = userData?.user?.id || null
-  const { error } = await supabase.from('gold_purchases').insert([{ purchase_date, amount, gold, user_id }])
+  const buy_price = parseFloat(document.getElementById('buyPrice').value)
+  const {error}=await supabase.from('gold_purchases').insert([{purchase_date,amount,gold,buy_price,user_id}])
   if (error) { showToast(error.message, 'error'); return }
   showToast('Purchase added')
   addForm.reset()
@@ -476,80 +464,100 @@ async function loadGoldPrice(filter = 'month'){
   if (error) { showToast(error.message, 'error'); return }
   drawGoldChart(data || [])
   if (data && data.length) {
-    const latest = data[data.length - 1]
-    priceValueInput.value = latest.price
-    priceDateInput.value = latest.price_date
-    lastUpdated.textContent = `Last updated: ${latest.price_date}`
+  const latest = data[data.length - 1];
+  document.getElementById('sellPrice').value = latest.sell_price || latest.price;
+  priceDateInput.value = latest.price_date;
+  lastUpdated.textContent = `Last updated: ${latest.price_date}`;
   } else lastUpdated.textContent = ''
   calculateSummary()
 }
-function drawGoldChart(rows){
-  const ctx = document.getElementById('goldChart').getContext('2d')
-  const labels = (rows || []).map(r => r.price_date)
-  const prices = (rows || []).map(r => r.price)
-  if (goldChart) goldChart.destroy()
+function drawGoldChart(data) {
+  const ctx = document.getElementById('goldChart').getContext('2d');
+  const labels = data.map(d => d.price_date);
+  const buyPrices = data.map(d => d.price);
+  const sellPrices = data.map(d => d.sell_price);
+
+  if (goldChart) goldChart.destroy();
+
   goldChart = new Chart(ctx, {
     type: 'line',
-    data: { labels, datasets: [{ label: 'Gold (₹/g)', data: prices, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.08)', fill:true, tension:0.18, pointRadius:4, pointBackgroundColor:'#f6e27a' }] },
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Sell Price (₹/g)',
+          data: sellPrices,
+          borderColor: '#ff6666',
+          backgroundColor: 'rgba(255,102,102,0.08)',
+          fill: true,
+          tension: 0.3,
+        }
+      ]
+    },
     options: {
-      responsive:true, maintainAspectRatio: false,
-      plugins:{legend:{display:false}},
-      scales:{ x:{ ticks:{ color:'#ccc', autoSkip: true, maxRotation:45 }, grid:{ color:'#222' } }, y:{ ticks:{ color:'#ccc', callback: v => '₹' + Number(v).toLocaleString('en-IN') }, grid:{ color:'#222' } }
+      plugins: {
+        legend: {
+          labels: { color: '#f6e27a' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#ccc' }, grid: { color: '#222' } },
+        y: { ticks: { color: '#ccc' }, grid: { color: '#222' } }
       }
     }
-  })
-  // size adjustment: keep container height fixed via CSS; Chart will fill it.
-  goldChart.resize()
+  });
 }
+
 filterWeek.addEventListener('click', ()=>{ filterWeek.classList.add('active'); filterMonth.classList.remove('active'); filterYear.classList.remove('active'); loadGoldPrice('week') })
 filterMonth.addEventListener('click', ()=>{ filterMonth.classList.add('active'); filterWeek.classList.remove('active'); filterYear.classList.remove('active'); loadGoldPrice('month') })
 filterYear.addEventListener('click', ()=>{ filterYear.classList.add('active'); filterWeek.classList.remove('active'); filterMonth.classList.remove('active'); loadGoldPrice('year') })
 
 savePriceBtn.addEventListener('click', async ()=>{
-  const price = parseFloat(priceValueInput.value)
+  const price = parseFloat(document.getElementById('sellPrice').value)
   const date = priceDateInput.value || formatDateISO(new Date())
   if (!price || price <= 0) { showToast('Enter valid gold price', 'error'); return }
-  const { error } = await supabase.from('gold_price').upsert([{ price_date: date, price }], { onConflict: ['price_date'] })
+  const { error } = await supabase
+    .from('gold_price').upsert([{ price_date: date, sell_price: price }], { onConflict: ['price_date'] })
   if (error) { showToast('Error saving price: ' + error.message, 'error'); return }
   showToast('Gold price saved')
   await loadGoldPrice(chartFilter)
 })
 
 /* ---------- Summary & profit ---------- */
-function calculateSummary(){
-  let totalGold = 0, totalCost = 0
+function calculateSummary() {
+  let totalGold = 0, totalCost = 0;
+
   purchaseTable.querySelectorAll('tr').forEach(tr => {
-    const tds = tr.querySelectorAll('td')
-    totalGold += parseFloat(tds[2].innerText) || 0
-    totalCost += unformatCurrency(tds[1].innerText)
-  })
-  totalGoldEl.innerText = totalGold.toFixed(3)
-  totalCostEl.innerText = formatCurrency(totalCost)
+    const tds = tr.querySelectorAll('td');
+    const gold = parseFloat(tds[2].innerText) || 0;
+    const buyPrice = parseFloat(tds[3]?.dataset?.buyPrice || 0);
+    totalGold += gold;
+    totalCost += gold * buyPrice;
+  });
 
-  const price = parseFloat(priceValueInput.value)
-  const profitValueEl = document.getElementById('profitValue')
-  const profitPercentText = document.getElementById('profitPercentText')
+  totalGoldEl.innerText = totalGold.toFixed(3);
+  totalCostEl.innerText = formatCurrency(totalCost);
 
-  if (!price || price <= 0 || totalGold <= 0 || totalCost <= 0) {
-    profitValueEl.innerText = "₹0.00"
-    profitPercentText.innerText = "—"
-    profitValueEl.style.color = "#ccc"
-    currentValueEl.innerText = formatCurrency(totalCost)
-    return
+  const sellPrice = parseFloat(document.getElementById('sellPrice').value);
+  if (!sellPrice || sellPrice <= 0 || totalGold <= 0 || totalCost <= 0) {
+    profitValue.innerText = "₹0.00";
+    profitPercentText.innerText = "—";
+    profitValue.style.color = "#ccc";
+    currentValueEl.innerText = formatCurrency(totalCost);
+    return;
   }
 
-  const currentValue = totalGold * price
-  const profit = currentValue - totalCost
-  const percent = totalCost > 0 ? (profit / totalCost) * 100 : 0
-  const isGain = profit >= 0
-  profitValueEl.style.color = isGain ? "lightgreen" : "#ff6666"
-  const sign = isGain ? "+" : "–"
-  const word = isGain ? "gain" : "drop"
+  const currentValue = totalGold * sellPrice;
+  const profit = currentValue - totalCost;
+  const percent = (profit / totalCost) * 100;
+  const isGain = profit >= 0;
 
-  profitValueEl.innerText = formatCurrency(profit)
-  profitPercentText.innerHTML = `${sign}${Math.abs(percent).toFixed(2)} % <span style="color:#aaa">${word}</span>`
-  currentValueEl.innerText = formatCurrency(currentValue)
+  profitValue.style.color = isGain ? "lightgreen" : "#ff6666";
+  profitValue.innerText = formatCurrency(profit);
+  profitPercentText.innerHTML = `${isGain ? '+' : '–'}${Math.abs(percent).toFixed(2)} % <span style="color:#aaa;">${isGain ? 'gain' : 'drop'}</span>`;
+  currentValueEl.innerText = formatCurrency(currentValue);
 }
+
 
 /* ---------- Goal tracker ---------- */
 async function loadUserGoal(){
@@ -640,6 +648,21 @@ function setTodayInputs(){
   if (priceDateInput) priceDateInput.value = formatDateISO(new Date())
 }
 setTodayInputs()
+
+/* ---------- showApp & initial loads ---------- */
+function showApp(user){
+  currentUser = user
+  authContainer.style.display = 'none'
+  appDiv.style.display = 'block'
+  userInfoBtn.style.display = 'inline-block'
+  const displayEmail = user.email || (user.user && user.user.email) || ''
+  userInfoBtn.textContent = displayEmail + ' ▾'
+  dropdownEmail.textContent = displayEmail
+  // set default dates and formatting
+  setTodayInputs()
+  // load data
+  setTimeout(()=>{ loadPurchases(); loadGoldPrice(chartFilter); loadUserGoal() }, 60)
+}
 
 /* Detect password recovery link (optional UX) */
 (function detectRecoveryFlow(){
