@@ -87,6 +87,79 @@ tr:hover{background:rgba(212,175,55,0.06)}
 .confetti-wrap{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:999}
 .confetti-piece{position:absolute;width:10px;height:16px;opacity:0.95;transform-origin:center;will-change:transform,opacity}
 
+.auth-card {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px;
+  animation: fadeSlide 0.4s ease;
+}
+
+.auth-card.active {
+  display: flex;
+}
+
+.auth-form input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--dark-gold);
+  background: #000;
+  color: var(--light-gold);
+  text-align: center;
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(90deg, var(--gold), var(--dark-gold));
+  color: #000;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-form button:hover {
+  box-shadow: 0 0 15px rgba(212,175,55,0.4);
+}
+
+.auth-toggle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.auth-toggle a {
+  color: var(--light-gold);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-card h2 {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.auth-card button {
+  background: linear-gradient(90deg, var(--gold), var(--dark-gold));
+  transition: all 0.3s ease;
+}
+
+.auth-card button:hover {
+  box-shadow: 0 0 15px rgba(212,175,55,0.6);
+  transform: translateY(-1px);
+}
+
+
+@keyframes fadeSlide {
+  from {opacity: 0; transform: translateY(15px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+
 @media(max-width:720px){.summary{flex-direction:column}.card{flex:1 1 100%}}
 </style>
 </head>
@@ -101,16 +174,35 @@ tr:hover{background:rgba(212,175,55,0.06)}
   </div>
 
   <div class="container">
-    <!-- Login -->
-    <div id="loginDiv">
-      <h2 style="color:var(--gold)">Login</h2>
-      <form id="loginForm">
-        <input id="loginEmail" type="email" placeholder="Email" required />
-        <input id="loginPassword" type="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-      </form>
-      <p>Don’t have an account? <a href="#" id="signupLink">Sign up</a></p>
-    </div>
+    <!-- Auth Container -->
+	<div id="authContainer" class="auth-container">
+	  <!-- LOGIN -->
+	  <div id="loginDiv" class="auth-card active">
+		<h2 style="color:var(--gold)">Login</h2>
+		<form id="loginForm" class="auth-form">
+		  <input id="loginEmail" type="email" placeholder="Email" required />
+		  <input id="loginPassword" type="password" placeholder="Password" required />
+		  <button type="submit">Login</button>
+		</form>
+		<p class="auth-toggle">
+		  Don’t have an account? <a href="#" id="showSignup">Sign up</a>
+		</p>
+	  </div>
+
+	  <!-- SIGNUP -->
+	  <div id="signupDiv" class="auth-card">
+		<h2 style="color:var(--gold)">Sign Up</h2>
+		<form id="signupForm" class="auth-form">
+		  <input id="signupEmail" type="email" placeholder="Email" required />
+		  <input id="signupPassword" type="password" placeholder="Password" required />
+		  <button type="submit">Create Account</button>
+		</form>
+		<p class="auth-toggle">
+		  Already have an account? <a href="#" id="showLogin">Back to Login</a>
+		</p>
+	  </div>
+	</div>
+
 
     <!-- App -->
     <div id="appDiv" style="display:none;">
@@ -121,17 +213,17 @@ tr:hover{background:rgba(212,175,55,0.06)}
         </div>
 
         <div class="card">
-          <div class="label">Total Cost</div>
+          <div class="label">Buy Price</div>
           <div class="value"><span id="totalCost">₹0.00</span></div>
         </div>
 
         <div class="card">
-          <div class="label">Current Value</div>
+          <div class="label">Current Price</div>
           <div class="value"><span id="currentValue">₹0.00</span></div>
         </div>
 
         <div class="card" id="profitCard">
-          <div class="label">Profit / Loss</div>
+          <div class="label">Portfolio Value</div>
           <div class="value">
             <div id="profitValue" style="font-size:1.3rem;font-weight:700;">₹0.00</div>
             <div id="profitPercentText" style="font-size:0.85rem;color:#bbb;margin-top:4px;">—</div>
@@ -284,14 +376,45 @@ loginForm.addEventListener('submit',async e=>{
   showToast('Login successful')
   showApp(currentUser)
 })
-signupLink.addEventListener('click',async e=>{
+// 🔹 Toggle between Login and Signup
+const loginCard = document.getElementById('loginDiv')
+const signupCard = document.getElementById('signupDiv')
+document.getElementById('showSignup').addEventListener('click', e => {
   e.preventDefault()
-  const email=prompt('Email:')
-  const pw=prompt('Password:')
-  if(!email||!pw)return
-  const {error}=await supabase.auth.signUp({email,password:pw})
-  error?showToast(error.message,'error'):showToast('Signup success!')
+  loginCard.classList.remove('active')
+  signupCard.classList.add('active')
 })
+document.getElementById('showLogin').addEventListener('click', e => {
+  e.preventDefault()
+  signupCard.classList.remove('active')
+  loginCard.classList.add('active')
+})
+
+// 🔹 Handle Sign Up
+const signupForm = document.getElementById('signupForm')
+signupForm.addEventListener('submit', async e => {
+  e.preventDefault()
+  const email = document.getElementById('signupEmail').value
+  const password = document.getElementById('signupPassword').value
+  const { error } = await supabase.auth.signUp({ email, password })
+  if (error) return showToast(error.message, 'error')
+  showToast('Account created! Please login ✨')
+  signupCard.classList.remove('active')
+  loginCard.classList.add('active')
+})
+
+// 🔹 Handle Login
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault()
+  const email = document.getElementById('loginEmail').value
+  const pw = document.getElementById('loginPassword').value
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw })
+  if (error) return showToast(error.message, 'error')
+  currentUser = data.user
+  showToast('Login successful!')
+  showApp(currentUser)
+})
+
 logoutBtn.addEventListener('click',async()=>{await supabase.auth.signOut();location.reload()})
 
 /* ---------- APP ---------- */
@@ -424,7 +547,7 @@ async function loadUserGoal(){
 	}).replace(/ /g, '-')
 
 	document.getElementById('goalSummary').innerText = 
-	  `Target: ${currentGoal.target_grams}g by ${formattedDate}`
+	  `Target ${currentGoal.target_grams}g by ${formattedDate}`
 
   } else {
     document.getElementById('goalSummary').innerText='No goal set'
